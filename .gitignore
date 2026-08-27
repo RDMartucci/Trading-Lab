@@ -18,6 +18,7 @@ out/
 Thumbs.db
 
 # TypeScript
+dist/
 *.tsbuildinfo
 
 # Docker

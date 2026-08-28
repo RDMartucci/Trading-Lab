@@ -1,3 +1,5 @@
+import { TwelveDataProviderError } from "./twelve-data-provider-error.js";
+
 export type MarketQuote = {
   source: "twelve-data";
   symbol: string;
@@ -34,15 +36,7 @@ type TwelveDataQuoteResponse = {
   volume?: string;
 };
 
-export class TwelveDataProviderError extends Error {
-  constructor(
-    message: string,
-    public readonly statusCode: number
-  ) {
-    super(message);
-    this.name = "TwelveDataProviderError";
-  }
-}
+
 
 export class TwelveDataQuoteProvider {
   private readonly baseUrl = "https://api.twelvedata.com/quote";

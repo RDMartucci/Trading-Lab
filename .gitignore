@@ -23,3 +23,11 @@ dist/
 
 # Docker
 docker-data/
+
+# Archivos varios
+*.doc
+*.docx
+*.pdf
+*.txt
+*terabox.uploading.cfg
+

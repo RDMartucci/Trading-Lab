@@ -189,75 +189,102 @@ Estado
 ✅ Pruebas manuales correctas
 🎯 FASE COMPLETADA
 
-🟡 FASE 7 — Persistencia de datos ← PRÓXIMO BLOQUE
-Esta es nuestra próxima gran etapa.
-Actualmente tenemos:
-Twelve Data
-     ↓
-Backend
-     ↓
-JSON
-Queremos llegar a:
+� FASE 7 — Persistencia de datos ✅ COMPLETADA
+Esta fase da persistencia a nuestros datos de mercado.
+
 Twelve Data
      ↓
 Backend
      ↓
 Normalización
      ↓
-PostgreSQL
+PostgreSQL ← Ahora persistimos aquí
      ↓
 API propia
      ↓
 Frontend
-7.1 Modelo de datos
-Primero:
-assets
-assets
-├── id
-├── symbol
-├── name
-├── exchange
-├── currency
-├── asset_type
-└── created_at
-Después:
-market_candles
-market_candles
-├── id
-├── asset_id
-├── timeframe
-├── datetime
-├── open
-├── high
-├── low
-├── close
-├── volume
-└── created_at
-Y:
-UNIQUE(asset_id, timeframe, datetime)
-para evitar duplicados.
 
-🟡 FASE 8 — Repository / Service Layer
-Después de crear las tablas, evitaremos que app.ts tenga lógica de negocio.
-La arquitectura evolucionará a:
-Routes
+7.1 Modelo de datos ✅
+Tabla: market_assets
+├── id SERIAL PRIMARY KEY
+├── symbol VARCHAR(64) UNIQUE
+├── source VARCHAR(32) DEFAULT 'twelve-data'
+├── asset_type VARCHAR(32) DEFAULT 'stock'
+├── name VARCHAR(255)
+├── exchange VARCHAR(128)
+├── currency VARCHAR(16)
+└── created_at TIMESTAMPTZ
+
+Tabla: market_candles
+├── id SERIAL PRIMARY KEY
+├── asset_id INTEGER FK
+├── source VARCHAR(32) DEFAULT 'twelve-data'
+├── timeframe VARCHAR(16)
+├── candle_time TIMESTAMPTZ
+├── open NUMERIC(18, 6)
+├── high NUMERIC(18, 6)
+├── low NUMERIC(18, 6)
+├── close NUMERIC(18, 6)
+├── volume NUMERIC(18, 6) NULL
+├── created_at TIMESTAMPTZ
+└── UNIQUE(asset_id, source, timeframe, candle_time)
+
+7.2 Migraciones SQL ✅
+Archivo: database/migrations/001_market_schema.sql
+✅ Creadas ambas tablas
+✅ Índice en (asset_id, timeframe, candle_time)
+✅ UNIQUE constraints
+✅ FK con CASCADE
+
+7.3 Modelos TypeScript ✅
+Archivo: backend/src/models/market-candle.ts
+✅ type MarketAsset
+✅ type MarketCandleRecord
+
+7.4 Repository Pattern ✅
+Archivo: backend/src/repositories/market-candle.repository.ts
+✅ class MarketCandleRepository
+✅ ensureAsset(symbol, source) → asset_id
+✅ upsertHistory(MarketTimeSeries) → INSERT ... ON CONFLICT
+✅ getHistoryBySymbol(symbol, interval, limit) → MarketCandle[]
+
+7.5 Service Layer ✅
+Archivo: backend/src/services/market/market-history.service.ts
+✅ class MarketHistoryService
+✅ getHistory() → obtiene de Twelve Data y persiste en PostgreSQL
+✅ getPersistedHistory() → obtiene datos de PostgreSQL
+
+🟡 FASE 8 — Endpoints de API completa ← PRÓXIMO BLOQUE
+Integrar Controllers y Routes para usar el Repository y Service Layer.
+
+Estructura actual:
+Routes (vacía)
    ↓
-Controllers
+Controllers (vacía)
    ↓
-Services
+Services (✅ MarketHistoryService implementado)
    ↓
-Repositories
+Repositories (✅ MarketCandleRepository implementado)
    ↓
 PostgreSQL
-Por ejemplo:
-market-history.controller.ts
-          ↓
-market-history.service.ts
-          ↓
-market-candle.repository.ts
-          ↓
-PostgreSQL
-Esto nos va a permitir escalar muchísimo mejor.
+
+Tareas:
+⬜ Crear market.controller.ts con:
+  - getHistory(symbol, interval, outputsize)
+  - getSyncedHistory(symbol, interval, limit)
+  - syncMarketData(symbol, interval, outputsize)
+  
+⬜ Crear routes/market.routes.ts con:
+  - GET /api/market/history/:symbol (ya existe, migrar a controller)
+  - GET /api/market/synced-history/:symbol (obtener de PostgreSQL)
+  - POST /api/market/sync/:symbol (sincronizar Twelve Data → PostgreSQL)
+  - GET /api/assets (listar activos)
+  - GET /api/assets/:symbol (obtener asset específico)
+
+⬜ Refactorizar app.ts para:
+  - Eliminar lógica inline
+  - Usar controllers y routes
+  - Mejorar middleware
 
 🟡 FASE 9 — Sincronización de mercado
 Crearemos mecanismos para:

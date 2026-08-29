@@ -1,15 +1,13 @@
 import express from "express";
-import { config } from "dotenv";
-import { fileURLToPath } from "node:url";
-import { dirname, resolve } from "node:path";
+
+import { env } from "./config/env.js";
 
 import { TwelveDataProviderError } from "./market-data/twelve-data-provider-error.js";
 import { TwelveDataQuoteProvider } from "./market-data/twelve-data-quote-provider.js";
 import { TwelveDataTimeSeriesProvider } from "./market-data/twelve-data-time-series-provider.js";
 
-config({
-  path: resolve(dirname(fileURLToPath(import.meta.url)), "../../.env")
-});
+import { pool } from "./database/postgres.js";
+
 
 const app = express();
 
@@ -24,7 +22,9 @@ app.get("/api/health", (_req, res) => {
   });
 });
 
-const quoteProvider = new TwelveDataQuoteProvider(process.env.API_KEY_TWELVEDATA);
+const quoteProvider = new TwelveDataQuoteProvider(
+  env.twelveData.apiKey
+);
 
 app.get("/api/market/quote/:symbol", async (req, res) => {
   try {
@@ -52,7 +52,7 @@ app.get("/api/market/quote/:symbol", async (req, res) => {
 });
 
 const timeSeriesProvider = new TwelveDataTimeSeriesProvider(
-  process.env.API_KEY_TWELVEDATA
+  env.twelveData.apiKey
 );
 
 
@@ -117,6 +117,16 @@ app.get("/api/market/history/:symbol", async (req, res) => {
     });
   }
 });
+
+pool.query("SELECT NOW()")
+  .then(() => {
+    console.log("PostgreSQL connection OK");
+  })
+  .catch((error) => {
+    console.error("PostgreSQL connection failed", error);
+  }
+);
+
 
 app.listen(PORT, () => {
   console.log(`Trading Lab API running on http://localhost:${PORT}`);

@@ -1,0 +1,546 @@
+Claro. Estamos en un muy buen punto de corte: ya tenemos infraestructura, backend, PostgreSQL y la primera integración de mercado funcionando. Te dejo el roadmap consolidado para que tengamos una hoja de ruta única y no vayamos improvisando sobre la marcha.
+📈 Trading Lab — Roadmap del proyecto
+🟢 FASE 0 — Definición y arquitectura
+Estado	Tarea
+✅	Definir objetivo general de Trading Lab
+✅	Definir arquitectura inicial Frontend / Backend / DB
+✅	Elegir Next.js + TypeScript para frontend
+✅	Elegir Node.js + Express + TypeScript para backend
+✅	Elegir PostgreSQL como base de datos
+✅	Definir Docker como entorno para PostgreSQL
+✅	Priorizar APIs gratuitas o con free tier
+Resultado: arquitectura inicial definida.
+
+🟢 FASE 1 — Estructura del proyecto
+Trading-Lab/
+│
+├── .env
+├── .gitignore
+├── README.md
+├── compose.yaml
+│
+├── backend/
+│   ├── package.json
+│   ├── tsconfig.json
+│   └── src/
+│       ├── app.ts
+│       ├── config/
+│       │   └── env.ts
+│       ├── database/
+│       │   └── postgres.ts
+│       └── market-data/
+│           ├── twelve-data-provider-error.ts
+│           ├── twelve-data-quote-provider.ts
+│           └── twelve-data-time-series-provider.ts
+│
+└── frontend/
+    ├── app/
+    ├── package.json
+    ├── tsconfig.json
+    └── ...
+Estado
+✅ Monorepo inicial
+✅ Git inicializado
+✅ .gitignore
+✅ README inicial
+✅ Backend inicial
+✅ Frontend inicial
+✅ TypeScript
+✅ Next.js
+✅ Express
+
+🟢 FASE 2 — Frontend base
+Next.js
+✅ Proyecto creado
+✅ App Router
+✅ TypeScript
+✅ Configuración de TypeScript
+✅ ESLint
+✅ CSS global
+✅ Next.js funcionando
+Verificación
+npm run dev
+✅ Funciona.
+Y:
+npm run build
+✅ Compilación de producción correcta.
+Pendiente
+⬜ Layout definitivo
+⬜ Sistema de navegación
+⬜ Dashboard
+⬜ Componentes reutilizables
+⬜ Gráficos
+⬜ Selector de activos
+⬜ Vista de mercado
+⬜ Vista de histórico
+⬜ Backtesting UI
+⬜ Gestión de estrategias
+
+🟢 FASE 3 — Backend base
+Express + TypeScript
+✅ Express configurado
+✅ TypeScript configurado
+✅ ESM / NodeNext
+✅ tsx watch
+✅ Build mediante tsc
+✅ Endpoint:
+GET /api/health
+Resultado
+{
+  "status": "ok",
+  "service": "trading-lab-backend"
+}
+
+🟢 FASE 4 — Configuración y secretos
+Implementamos:
+Trading-Lab/.env
+con variables como:
+POSTGRES_DB=trading_lab
+POSTGRES_USER=trading_lab_user
+POSTGRES_PASSWORD=********
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
+
+API_KEY_TWELVEDATA=********
+Y creamos:
+backend/src/config/env.ts
+para centralizar la configuración.
+Estado
+✅ .env en raíz
+✅ .env fuera del repositorio mediante .gitignore
+✅ Configuración centralizada
+✅ Twelve Data key
+✅ PostgreSQL credentials
+✅ Corrección de carga de .env
+
+🟢 FASE 5 — Docker + PostgreSQL
+Creamos:
+compose.yaml
+con:
+PostgreSQL 17
+        │
+        ▼
+trading-lab-postgres
+        │
+        ▼
+5432
+Estado
+✅ Docker funcionando
+✅ Docker Compose funcionando
+✅ PostgreSQL 17
+✅ Base trading_lab
+✅ Usuario trading_lab_user
+✅ Password configurada
+✅ Volumen persistente
+✅ Puerto 5432
+✅ Container levantando correctamente
+✅ pg_isready OK
+✅ conexión mediante psql OK
+✅ pg instalado en backend
+✅ Pool configurado
+Última verificación
+PostgreSQL connection OK
+🎯 FASE COMPLETADA
+
+🟢 FASE 6 — Twelve Data
+Elegimos Twelve Data como primer proveedor de datos financieros.
+Integración
+backend/
+└── src/
+    └── market-data/
+        ├── twelve-data-provider-error.ts
+        ├── twelve-data-quote-provider.ts
+        └── twelve-data-time-series-provider.ts
+Quote
+Implementamos:
+GET /api/market/quote/:symbol
+Permite obtener:
+precio
+variación
+variación %
+apertura
+máximo
+mínimo
+volumen
+moneda
+exchange
+fecha/hora
+Histórico OHLCV
+Implementamos:
+GET /api/market/history/:symbol
+con parámetros:
+interval
+outputsize
+Por ejemplo:
+/api/market/history/AAPL?interval=1day&outputsize=30
+Estado
+✅ API key configurada
+✅ conexión comprobada
+✅ Quote API
+✅ Histórico
+✅ OHLCV
+✅ Normalización de datos
+✅ Conversión de strings a números
+✅ Manejo de errores
+✅ Validación de outputsize
+✅ Validación de símbolo
+✅ Manejo de rate limit
+✅ Build correcto
+✅ Pruebas manuales correctas
+🎯 FASE COMPLETADA
+
+🟡 FASE 7 — Persistencia de datos ← PRÓXIMO BLOQUE
+Esta es nuestra próxima gran etapa.
+Actualmente tenemos:
+Twelve Data
+     ↓
+Backend
+     ↓
+JSON
+Queremos llegar a:
+Twelve Data
+     ↓
+Backend
+     ↓
+Normalización
+     ↓
+PostgreSQL
+     ↓
+API propia
+     ↓
+Frontend
+7.1 Modelo de datos
+Primero:
+assets
+assets
+├── id
+├── symbol
+├── name
+├── exchange
+├── currency
+├── asset_type
+└── created_at
+Después:
+market_candles
+market_candles
+├── id
+├── asset_id
+├── timeframe
+├── datetime
+├── open
+├── high
+├── low
+├── close
+├── volume
+└── created_at
+Y:
+UNIQUE(asset_id, timeframe, datetime)
+para evitar duplicados.
+
+🟡 FASE 8 — Repository / Service Layer
+Después de crear las tablas, evitaremos que app.ts tenga lógica de negocio.
+La arquitectura evolucionará a:
+Routes
+   ↓
+Controllers
+   ↓
+Services
+   ↓
+Repositories
+   ↓
+PostgreSQL
+Por ejemplo:
+market-history.controller.ts
+          ↓
+market-history.service.ts
+          ↓
+market-candle.repository.ts
+          ↓
+PostgreSQL
+Esto nos va a permitir escalar muchísimo mejor.
+
+🟡 FASE 9 — Sincronización de mercado
+Crearemos mecanismos para:
+Twelve Data
+     ↓
+descargar histórico
+     ↓
+validar
+     ↓
+normalizar
+     ↓
+guardar PostgreSQL
+Por ejemplo:
+POST /api/market/sync/AAPL
+Podremos eventualmente especificar:
+symbol
+interval
+desde
+hasta
+Y controlar:
+duplicados
+datos incompletos
+errores
+rate limits
+reintentos
+
+🟡 FASE 10 — API de mercado propia
+Una vez persistidos los datos, el frontend no debería depender directamente de Twelve Data.
+Tendremos endpoints propios:
+GET /api/assets
+GET /api/assets/:symbol
+GET /api/market/quote/:symbol
+GET /api/market/history/:symbol
+Y posteriormente:
+GET /api/market/candles/:symbol
+La idea es que PostgreSQL sea nuestro source of truth histórico.
+
+🟡 FASE 11 — Dashboard
+Aquí empieza a tomar forma visual el Trading Lab.
+Dashboard con:
+┌─────────────────────────────────────────┐
+│ Trading Lab                             │
+├─────────────────────────────────────────┤
+│ Buscar activo: AAPL                     │
+├─────────────────────────────────────────┤
+│ Precio       Variación      Volumen      │
+│ $...         +...%         ...           │
+├─────────────────────────────────────────┤
+│                                         │
+│          GRÁFICO OHLC / CANDLE           │
+│                                         │
+├─────────────────────────────────────────┤
+│ Histórico │ Indicadores │ Estrategias   │
+└─────────────────────────────────────────┘
+
+🟡 FASE 12 — Gráficos financieros
+Implementaremos gráficos de:
+🕯️ Candlestick
+📊 Volumen
+📈 líneas
+📉 drawdown
+medias móviles
+indicadores técnicos
+Probablemente evaluaremos una librería especializada para gráficos financieros.
+
+🟡 FASE 13 — Indicadores técnicos
+Primer conjunto:
+Tendencia
+SMA
+EMA
+WMA
+Momentum
+RSI
+MACD
+Stochastic
+Volatilidad
+Bollinger Bands
+ATR
+Volumen
+Volume
+VWAP
+Estos indicadores alimentarán posteriormente las estrategias.
+
+🟠 FASE 14 — Motor de estrategias
+Acá empieza el verdadero Trading Lab.
+Diseñaremos estrategias como:
+Strategy
+├── name
+├── timeframe
+├── parameters
+├── entry()
+├── exit()
+└── riskManagement()
+Ejemplo:
+SMA 20 / SMA 50
+
+Compra:
+SMA20 cruza SMA50 hacia arriba
+
+Venta:
+SMA20 cruza SMA50 hacia abajo
+
+🟠 FASE 15 — Backtesting Engine
+Motor para ejecutar una estrategia sobre datos históricos:
+Historical Data
+       ↓
+Strategy
+       ↓
+Signals
+       ↓
+Orders
+       ↓
+Portfolio
+       ↓
+Performance
+Calcularemos:
+retorno total
+retorno anualizado
+CAGR
+Sharpe Ratio
+Sortino
+máximo drawdown
+win rate
+profit factor
+cantidad de operaciones
+promedio por operación
+mejor operación
+peor operación
+
+🟠 FASE 16 — Gestión de capital y riesgo
+Agregar:
+capital inicial
+posición máxima
+stop loss
+take profit
+trailing stop
+comisión
+slippage
+riesgo por operación
+position sizing
+Esto es fundamental para que el backtesting no sea simplemente "comprar/vender en papel".
+
+🔴 FASE 17 — Optimización de estrategias
+Una vez funcionando el backtester:
+Strategy
+   ↓
+Parameter Space
+   ↓
+Backtests
+   ↓
+Evaluation
+   ↓
+Best Parameters
+Podremos experimentar con:
+grid search
+walk-forward analysis
+parámetros
+diferentes activos
+diferentes timeframes
+Y más adelante métodos más avanzados.
+
+🔴 FASE 18 — Machine Learning / AI
+Esto vendrá después del motor de trading.
+Posibles módulos:
+ML
+├── feature engineering
+├── dataset generation
+├── train/test split
+├── model training
+├── prediction
+├── validation
+└── inference
+Modelos potenciales:
+regresión
+Random Forest
+XGBoost
+LightGBM
+redes neuronales
+modelos temporales
+Y eventualmente:
+Trading Strategy
+        +
+Machine Learning
+        ↓
+Hybrid Strategy
+
+🔴 FASE 19 — Paper Trading
+Antes de pensar en dinero real:
+Market Data
+     ↓
+Strategy
+     ↓
+Signal
+     ↓
+Paper Order
+     ↓
+Virtual Portfolio
+Con:
+saldo virtual
+posiciones
+órdenes
+P&L
+historial
+
+🔴 FASE 20 — Autenticación y usuarios
+Cuando el núcleo funcione:
+Users
+  ↓
+Authentication
+  ↓
+JWT / Sessions
+  ↓
+Personal strategies
+  ↓
+Personal backtests
+  ↓
+Portfolios
+También podremos agregar roles:
+USER
+ADMIN
+
+🔴 FASE 21 — Producción
+Finalmente:
+                 ┌──────────────┐
+                 │   Frontend   │
+                 │   Next.js    │
+                 └──────┬───────┘
+                        │
+                        ▼
+                 ┌──────────────┐
+                 │   Backend    │
+                 │ Express/TS   │
+                 └──────┬───────┘
+                        │
+          ┌─────────────┴─────────────┐
+          ▼                           ▼
+   ┌──────────────┐           ┌──────────────┐
+   │ PostgreSQL   │           │ Market APIs  │
+   └──────────────┘           └──────────────┘
+Y posteriormente:
+CI/CD
+testing
+logging
+monitoring
+Docker
+deployment
+backups
+seguridad
+rate limiting
+observabilidad
+
+🧭 Dónde estamos ahora
+La fotografía actual sería:
+FASE 0  ██████████  ✅
+FASE 1  ██████████  ✅
+FASE 2  ██████████  ✅
+FASE 3  ██████████  ✅
+FASE 4  ██████████  ✅
+FASE 5  ██████████  ✅
+FASE 6  ██████████  ✅
+
+FASE 7  ░░░░░░░░░░  ⬅️ AHORA
+
+FASE 8  ░░░░░░░░░░
+FASE 9  ░░░░░░░░░░
+FASE 10 ░░░░░░░░░░
+...
+🎯 Próximo objetivo
+Yo no saltaría todavía al frontend ni a los gráficos.
+Nuestro próximo bloque debería ser:
+FASE 7 — Persistencia de mercado
+En este orden:
+1.Diseñar el esquema PostgreSQL.
+2.Crear assets.
+3.Crear market_candles.
+4.Crear índices y restricciones.
+5.Crear repositorios.
+6.Crear servicio de persistencia.
+7.Crear endpoint de sincronización.
+8.Descargar AAPL desde Twelve Data.
+9.Guardarlo en PostgreSQL.
+10.Ejecutar la misma sincronización nuevamente y comprobar que no duplica velas.
+11.Crear endpoint para consultar nuestro histórico desde PostgreSQL.
+12.Comparar resultado PostgreSQL vs Twelve Data.
+Ese último punto es especialmente importante: nos permitirá demostrar que nuestro pipeline de datos funciona correctamente antes de construir toda la capa visual.
+Así que el próximo paso concreto es diseñar y crear las tablas assets y market_candles. Ahí empezamos a convertir Trading Lab de una API que consulta datos en una verdadera plataforma de análisis. 🚀

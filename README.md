@@ -1,62 +1,86 @@
 # Trading Lab
 
-Trading Lab es una plataforma en desarrollo para explorar, analizar y probar
-estrategias de trading. El proyecto está organizado como una aplicación web
-con un frontend en Next.js, una API en Express y una base de datos PostgreSQL
-gestionada con Docker Compose.
+Trading Lab es un proyecto de analítica y exploración de mercados financieros con una arquitectura monolítica modular orientada a servicios. La intención del proyecto es disponer de un backend para consultar datos de mercado, preparar indicadores y servicios de análisis, y un frontend para visualizar información y construir una experiencia de trading.
 
-> **Estado actual:** el proyecto se encuentra en una etapa inicial. El backend
-> expone un endpoint de salud y el frontend conserva la pantalla inicial de
-> Next.js. Las capas de servicios, modelos, repositorios y rutas ya tienen una
-> estructura preparada para continuar el desarrollo.
+## Estado actual
+
+El proyecto ya tiene la base funcional de una aplicación full-stack con:
+
+- backend en Node.js + Express + TypeScript
+- frontend en Next.js + React + TypeScript
+- PostgreSQL como almacenamiento relacional
+- conexión con Twelve Data para cotizaciones e historiales de mercado
+- estructura preparada para crecer en módulos de señales, cartera, indicadores, noticias y backtesting
+
+> El proyecto está en una etapa de base técnica y desarrollo inicial: el backend ya expone endpoints de salud y de mercado, y el frontend aún conserva la plantilla inicial de Next.js que luego se sustituirá por la experiencia de Trading Lab.
 
 ## Stack tecnológico
 
-- **Frontend:** Next.js 16, React 19, TypeScript y Tailwind CSS 4.
-- **Backend:** Node.js, Express 5, TypeScript y `tsx` para desarrollo.
-- **Base de datos:** PostgreSQL 17.
-- **Infraestructura local:** Docker Compose.
+- Frontend: Next.js 16, React 19, TypeScript, Tailwind CSS 4
+- Backend: Node.js, Express 5, TypeScript, tsx
+- Base de datos: PostgreSQL 17
+- Infraestructura local: Docker Compose
+- APIs externas: Twelve Data
 
-## Requisitos
+## Requisitos previos
 
-- Node.js compatible con las versiones declaradas en los `package.json`.
-- npm.
-- Docker Desktop con Docker Compose.
+- Node.js 20+ o compatible con las versiones declaradas en los package.json
+- npm
+- Docker Desktop con Docker Compose
+- Una clave API válida de Twelve Data para consumir datos reales de mercado
 
-## Inicio rápido
+## Configuración de entorno
 
-### 1. Configurar PostgreSQL
-
-En la raíz del proyecto, crea un archivo `.env` con las credenciales que
-utilizará el contenedor:
+En la raíz del proyecto crea un archivo `.env` basado en el ejemplo disponible:
 
 ```env
 POSTGRES_DB=trading_lab
-POSTGRES_USER=trading_lab
-POSTGRES_PASSWORD=change-me
+POSTGRES_USER=trading_lab_user
+POSTGRES_PASSWORD=tu_password_segura
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
+
+API_KEY_TWELVEDATA=tu_clave_twelvedata
 ```
 
-Inicia la base de datos:
+También puedes usar el archivo `.env.example` como referencia:
+
+```bash
+cp .env.example .env
+```
+
+## Iniciar el entorno
+
+### 1) Levantar PostgreSQL
 
 ```bash
 docker compose up -d postgres
 ```
 
-PostgreSQL quedará disponible en `localhost:5432`.
+PostgreSQL quedará disponible en:
 
-### 2. Iniciar el backend
+- host: `localhost`
+- puerto: `5432`
+- base de datos: `trading_lab`
 
-En una terminal:
+### 2) Instalar dependencias del backend
 
 ```bash
 cd backend
 npm install
+```
+
+### 3) Ejecutar el backend
+
+```bash
 npm run dev
 ```
 
-La API se inicia en `http://localhost:4000`.
+La API quedará levantada en:
 
-Puedes comprobar su estado con:
+- `http://localhost:4000`
+
+Comprobar estado del servicio:
 
 ```bash
 curl http://localhost:4000/api/health
@@ -66,43 +90,82 @@ Respuesta esperada:
 
 ```json
 {
-	"status": "ok",
-	"service": "trading-lab-backend"
+  "status": "ok",
+  "service": "trading-lab-backend"
 }
 ```
 
-### 3. Iniciar el frontend
+### 4) Instalar dependencias del frontend
 
 En otra terminal:
 
 ```bash
 cd frontend
 npm install
+```
+
+### 5) Ejecutar el frontend
+
+```bash
 npm run dev
 ```
 
-Abre `http://localhost:3000` en el navegador.
+Abre la aplicación en:
+
+- `http://localhost:3000`
+
+## Endpoints actuales del backend
+
+### Salud
+
+```http
+GET /api/health
+```
+
+### Cotización en tiempo real
+
+```http
+GET /api/market/quote/:symbol
+```
+
+Ejemplo:
+
+```bash
+curl "http://localhost:4000/api/market/quote/AAPL"
+```
+
+### Historial de precios
+
+```http
+GET /api/market/history/:symbol?interval=1day&outputsize=30
+```
+
+Ejemplo:
+
+```bash
+curl "http://localhost:4000/api/market/history/AAPL?interval=1day&outputsize=30"
+```
 
 ## Scripts disponibles
 
 ### Backend
 
-Ejecutados desde `backend/`:
+Desde `backend/`:
 
 | Comando | Descripción |
 | --- | --- |
 | `npm run dev` | Inicia la API en modo desarrollo con recarga automática. |
-| `npm run build` | Compila TypeScript en `backend/dist/`. |
-| `npm start` | Ejecuta la API compilada. |
-| `npm test` | Marcador temporal; todavía no hay pruebas configuradas. |
+| `npm run build` | Compila la aplicación TypeScript. |
+| `npm start` | Ejecuta la versión compilada. |
+| `npm test` | Marcador temporal; aún no hay suite de pruebas configurada. |
 
 ### Frontend
 
-Ejecutados desde `frontend/`:
+Desde `frontend/`:
 
 | Comando | Descripción |
 | --- | --- |
-| `npm run dev` | Inicia Next.js en modo desarrollo. |
+| `npm run dev` | Inicia la app en modo desarrollo. |
 | `npm run build` | Genera la compilación de producción. |
 | `npm start` | Sirve la compilación de producción. |
 | `npm run lint` | Ejecuta ESLint. |
@@ -111,49 +174,64 @@ Ejecutados desde `frontend/`:
 
 ```text
 Trading-Lab/
+├── .env                     # Variables locales del entorno
+├── .env.example            # Plantilla de configuración
+├── compose.yaml            # Configuración de PostgreSQL con Docker Compose
+├── README.md               # Documentación principal
 ├── backend/
+│   ├── package.json
+│   ├── tsconfig.json
 │   └── src/
-│       ├── app.ts              # Punto de entrada de la API
-│       ├── config/              # Configuración
-│       ├── controllers/         # Controladores HTTP
-│       ├── middleware/          # Middleware de Express
-│       ├── models/              # Modelos de dominio
-│       ├── repositories/        # Acceso a datos
-│       ├── routes/              # Rutas de la API
-│       ├── services/            # Lógica de negocio
-│       └── utils/               # Utilidades compartidas
-├── database/                    # Espacio para scripts y migraciones
-├── docker/                      # Recursos auxiliares de Docker
-├── docs/                        # Documentación del proyecto
+│       ├── app.ts          # Entrada principal de la API
+│       ├── config/         # Configuración de entorno
+│       ├── controllers/    # Controladores HTTP
+│       ├── database/       # Pool de PostgreSQL
+│       ├── market-data/    # Integración con Twelve Data
+│       ├── middleware/     # Middleware de Express
+│       ├── models/         # Modelos de negocio
+│       ├── repositories/   # Acceso a datos
+│       ├── routes/         # Definición de rutas
+│       ├── services/       # Lógica de negocio
+│       └── utils/          # Utilidades compartidas
+├── database/               # Scripts, migraciones o recursos de BD
+├── docker/                 # Configuración y utilidades Docker
+├── docs/                   # Documentación del proyecto
 ├── frontend/
-│   └── app/                     # App Router de Next.js
-├── compose.yaml                 # Servicio local de PostgreSQL
-└── README.md
+│   ├── app/                # Enrutado principal de Next.js
+│   ├── public/             # Archivos estáticos
+│   ├── package.json
+│   ├── tsconfig.json
+│   ├── next.config.ts
+│   └── README.md           # README base generado por Next.js
+└── .gitignore
 ```
 
-## Detener el entorno
+## Gestión del entorno local
 
-Para detener PostgreSQL sin eliminar los datos persistidos:
+Detener PostgreSQL sin borrar datos persistidos:
 
 ```bash
 docker compose stop postgres
 ```
 
-Para detenerlo y eliminar también el contenedor:
+Detener y eliminar el contenedor:
 
 ```bash
 docker compose down
 ```
 
-El volumen `trading_lab_postgres_data` conserva los datos mientras no se
-elimine explícitamente.
+El volumen `trading_lab_postgres_data` conserva la información incluso si el contenedor se reinicia.
 
-## Próximos pasos sugeridos
+## Próximos pasos recomendados
 
-- Conectar el backend con PostgreSQL y añadir migraciones.
-- Definir contratos y rutas para mercado, indicadores, noticias, señales,
-	portafolios y backtesting.
-- Reemplazar la pantalla inicial de Next.js por el espacio de trabajo de
-	Trading Lab.
-- Incorporar pruebas automatizadas para backend y frontend.
+- conectar y normalizar el acceso a PostgreSQL con modelos reales
+- definir migraciones y esquema inicial para usuarios, cartera y señales
+- ampliar la API con indicadores, noticias, portafolios y backtesting
+- sustituir la pantalla inicial de Next.js por el dashboard de Trading Lab
+- añadir pruebas automatizadas para backend y frontend
+- separar servicios y rutas según dominio funcional
+
+## Notas finales
+
+Este repositorio está pensado como base para un entorno de trading con análisis técnico, datos de mercado y un flujo de trabajo propio para pruebas de estrategias. La estructura actual es funcional para arrancar, validar datos y preparar la capa de negocio que se desarrollará en las siguientes iteraciones.
 

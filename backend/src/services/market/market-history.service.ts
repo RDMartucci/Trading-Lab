@@ -34,4 +34,33 @@ export class MarketHistoryService {
       data
     };
   }
+
+  async syncHistory(
+    symbol: string,
+    interval: string,
+    outputsize = 30
+  ): Promise<{
+    symbol: string;
+    interval: string;
+    candlesInserted: number;
+    status: "ok";
+    timestamp: string;
+  }> {
+    const normalizedSymbol = symbol.trim().toUpperCase();
+
+    const history = await this.provider.getTimeSeries(
+      normalizedSymbol,
+      interval,
+      outputsize
+    );
+    const candlesInserted = await this.repository.upsertHistory(history);
+
+    return {
+      symbol: normalizedSymbol,
+      interval,
+      candlesInserted,
+      status: "ok",
+      timestamp: new Date().toISOString()
+    };
+  }
 }

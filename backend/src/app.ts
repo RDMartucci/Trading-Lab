@@ -10,10 +10,24 @@ import { TwelveDataProviderError } from "./market-data/twelve-data-provider-erro
 // Import routes
 import { marketRoutes } from "./routes/market.routes.js";
 import { assetsRoutes } from "./routes/assets.routes.js";
+import { syncRoutes } from "./routes/sync.routes.js";
 
 const app = express();
 
 const PORT = 4000;
+
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
+  if (req.method === "OPTIONS") {
+    res.sendStatus(204);
+    return;
+  }
+
+  next();
+});
 
 app.use(express.json());
 
@@ -28,6 +42,7 @@ app.get("/api/health", (_req, res) => {
 // Mount routes
 app.use("/api/market", marketRoutes);
 app.use("/api/assets", assetsRoutes);
+app.use("/api/sync", syncRoutes);
 
 // Initialize services
 const marketHistoryService = new MarketHistoryService();

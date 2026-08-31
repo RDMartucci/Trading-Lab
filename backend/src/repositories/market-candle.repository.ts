@@ -30,12 +30,20 @@ export class MarketCandleRepository {
     return Number(result.rows[0].id);
   }
 
-  async upsertHistory(history: MarketTimeSeries): Promise<void> {
+  async upsertHistory(history: MarketTimeSeries): Promise<number> {
     if (history.data.length === 0) {
-      return;
+      return 0;
     }
 
     const assetId = await this.ensureAsset(history.symbol, history.source);
+    const candleTimes = history.data.map((candle) => normalizeCandleTime(candle.datetime));
+    const beforeCount = await this.countCandlesByTimes(
+      assetId,
+      history.source,
+      history.interval,
+      candleTimes
+    );
+
     const rows: string[] = [];
     const params: unknown[] = [];
 
@@ -88,6 +96,40 @@ export class MarketCandleRepository {
     `;
 
     await pool.query(query, params);
+
+    const afterCount = await this.countCandlesByTimes(
+      assetId,
+      history.source,
+      history.interval,
+      candleTimes
+    );
+
+    return Math.max(0, afterCount - beforeCount);
+  }
+
+  private async countCandlesByTimes(
+    assetId: number,
+    source: string,
+    interval: string,
+    candleTimes: string[]
+  ): Promise<number> {
+    if (candleTimes.length === 0) {
+      return 0;
+    }
+
+    const result = await pool.query<{ count: string }>(
+      `
+        SELECT COUNT(*)::int AS count
+        FROM market_candles
+        WHERE asset_id = $1
+          AND source = $2
+          AND timeframe = $3
+          AND candle_time = ANY($4)
+      `,
+      [assetId, source, interval, candleTimes]
+    );
+
+    return Number(result.rows[0]?.count ?? 0);
   }
 
   async getHistoryBySymbol(

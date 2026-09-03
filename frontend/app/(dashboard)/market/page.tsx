@@ -52,8 +52,8 @@ const DEFAULT_SYMBOL = 'AAPL';
 const DEFAULT_INTERVAL = '1day';
 const API_BASE = 'http://localhost:4000';
 
-function CandlestickChart({ candles }: { candles: Candle[] }) {
-  const chartCandles = candles.slice(-30);
+function CandlestickChart({ candles, visibleCandles }: { candles: Candle[]; visibleCandles: number }) {
+  const chartCandles = candles.slice(-visibleCandles);
 
   if (!chartCandles.length) {
     return (
@@ -119,8 +119,8 @@ function CandlestickChart({ candles }: { candles: Candle[] }) {
   );
 }
 
-function VolumeChart({ candles }: { candles: Candle[] }) {
-  const chartCandles = candles.slice(-30);
+function VolumeChart({ candles, visibleCandles }: { candles: Candle[]; visibleCandles: number }) {
+  const chartCandles = candles.slice(-visibleCandles);
   const volumes = chartCandles.map((candle) => candle.volume ?? 0);
   const maxVolume = Math.max(...volumes, 0);
 
@@ -161,8 +161,8 @@ function VolumeChart({ candles }: { candles: Candle[] }) {
   );
 }
 
-function SmaChart({ values, emaValues }: { values: SmaResponse['data']['values']; emaValues: EmaResponse['data']['values'] }) {
-  const chartValues = values.slice(-30);
+function SmaChart({ values, emaValues, candles, visibleCandles }: { values: SmaResponse['data']['values']; emaValues: EmaResponse['data']['values']; candles: Candle[]; visibleCandles: number }) {
+  const chartValues = values.slice(-visibleCandles);
   const validSmaValues = chartValues.filter((value) => value.sma !== null);
 
   if (!chartValues.length || !validSmaValues.length) {
@@ -195,12 +195,45 @@ function SmaChart({ values, emaValues }: { values: SmaResponse['data']['values']
     })
     .filter((point): point is string => point !== null)
     .join(' ');
+  const candleByDate = new Map(candles.map((candle) => [candle.datetime, candle]));
+  const maxVolume = Math.max(...chartValues.map((value) => candleByDate.get(value.datetime)?.volume ?? 0), 1);
 
   return (
     <svg viewBox={`0 0 ${width} ${height}`} className="h-44 w-full rounded-2xl bg-slate-950/80">
+      {chartValues.map((value, index) => {
+        const candle = candleByDate.get(value.datetime);
+        const volume = candle?.volume ?? 0;
+        const x = padding + index * xStep;
+        const barHeight = (volume / maxVolume) * 24;
+
+        return (
+          <rect
+            key={`volume-${value.datetime}`}
+            x={x - Math.max(xStep * 0.3, 3)}
+            y={height - padding - barHeight}
+            width={Math.max(xStep * 0.6, 4)}
+            height={barHeight}
+            rx={2}
+            fill="#64748b"
+            opacity={0.45}
+          />
+        );
+      })}
       <polyline points={closePoints} fill="none" stroke="#94a3b8" strokeWidth="2" />
       <polyline points={smaPoints} fill="none" stroke="#22d3ee" strokeWidth="2.5" />
       <polyline points={emaPoints} fill="none" stroke="#f59e0b" strokeWidth="2.5" />
+      {chartValues.map((value, index) => {
+        const candle = candleByDate.get(value.datetime);
+        return (
+          <circle
+            key={`close-${value.datetime}`}
+            cx={padding + index * xStep}
+            cy={padding + ((max - value.close) / range) * (height - padding * 2)}
+            r="3"
+            fill={candle && candle.close >= candle.open ? '#22c55e' : '#f87171'}
+          />
+        );
+      })}
     </svg>
   );
 }
@@ -216,6 +249,7 @@ export default function MarketPage() {
   const [syncing, setSyncing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [syncMessage, setSyncMessage] = useState<string | null>(null);
+  const [visibleCandles, setVisibleCandles] = useState(30);
 
   const latestCandle = useMemo(() => candles[candles.length - 1], [candles]);
 
@@ -226,7 +260,7 @@ export default function MarketPage() {
     try {
       const [quoteRes, candlesRes] = await Promise.all([
         fetch(`${API_BASE}/api/market/quote/${selectedSymbol}`),
-        fetch(`${API_BASE}/api/market/candles/${selectedSymbol}?interval=${interval}&limit=30`),
+        fetch(`${API_BASE}/api/market/candles/${selectedSymbol}?interval=${interval}&limit=50`),
       ]);
       const smaRes = await fetch(`${API_BASE}/api/indicators/sma/${selectedSymbol}?interval=${interval}&period=14`);
       const emaRes = await fetch(`${API_BASE}/api/indicators/ema/${selectedSymbol}?interval=${interval}&period=14`);
@@ -272,7 +306,7 @@ export default function MarketPage() {
     setSyncMessage(null);
 
     try {
-      const response = await fetch(`${API_BASE}/api/sync/assets/${symbol.trim() || DEFAULT_SYMBOL}?interval=${interval}&outputsize=30`, {
+      const response = await fetch(`${API_BASE}/api/sync/assets/${symbol.trim() || DEFAULT_SYMBOL}?interval=${interval}&outputsize=50`, {
         method: 'POST',
       });
 
@@ -441,34 +475,76 @@ export default function MarketPage() {
               </section>
 
               <section className="rounded-3xl border border-slate-800/80 bg-slate-900/80 p-5 shadow-[0_12px_40px_rgba(15,23,42,0.35)]">
-                <div className="mb-4 flex items-center justify-between">
+                <div className="mb-4 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                   <div>
                     <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Candlestick</p>
                     <h3 className="mt-1 text-xl font-semibold text-white">{quote?.symbol ?? symbol} / {interval}</h3>
                   </div>
-                  <span className="rounded-full border border-slate-700 bg-slate-950/70 px-2.5 py-1 text-xs text-slate-300">{candles.length} candles</span>
+                  <div className="flex items-center gap-2">
+                    <span className="mr-1 text-xs text-slate-500">Zoom</span>
+                    <button
+                      type="button"
+                      onClick={() => setVisibleCandles((current) => Math.max(10, current - 10))}
+                      disabled={visibleCandles === 10}
+                      title="Show fewer candles"
+                      aria-label="Show fewer candles"
+                      className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-700 bg-slate-950/70 text-lg text-slate-200 transition hover:border-cyan-400 hover:text-cyan-300 disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      −
+                    </button>
+                    {[10, 20, 30, 50].map((count) => (
+                      <button
+                        key={count}
+                        type="button"
+                        onClick={() => setVisibleCandles(count)}
+                        aria-label={`Show ${count} candles`}
+                        className={`h-8 rounded-lg border px-2 text-xs transition ${visibleCandles === count ? 'border-cyan-400 bg-cyan-500/15 text-cyan-300' : 'border-slate-700 bg-slate-950/70 text-slate-300 hover:border-cyan-400 hover:text-cyan-300'}`}
+                      >
+                        {count}
+                      </button>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => setVisibleCandles((current) => Math.min(50, current + 10))}
+                      disabled={visibleCandles === 50}
+                      title="Show more candles"
+                      aria-label="Show more candles"
+                      className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-700 bg-slate-950/70 text-lg text-slate-200 transition hover:border-cyan-400 hover:text-cyan-300 disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      +
+                    </button>
+                    <span className="ml-1 rounded-full border border-slate-700 bg-slate-950/70 px-2.5 py-1 text-xs text-slate-300">{visibleCandles} candles</span>
+                  </div>
                 </div>
-                <CandlestickChart candles={candles} />
+                <CandlestickChart candles={candles} visibleCandles={visibleCandles} />
                 <div className="mt-3 flex items-center justify-between">
                   <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Volume</p>
-                  <span className="text-xs text-slate-500">Last 30 candles</span>
+                  <span className="text-xs text-slate-500">Same zoom range</span>
                 </div>
-                <VolumeChart candles={candles} />
+                <VolumeChart candles={candles} visibleCandles={visibleCandles} />
               </section>
 
               <section className="rounded-3xl border border-slate-800/80 bg-slate-900/80 p-5 shadow-[0_12px_40px_rgba(15,23,42,0.35)]">
-                <div className="mb-4 flex items-center justify-between">
+                <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                   <div>
                     <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Technical indicator</p>
-                    <h3 className="mt-1 text-xl font-semibold text-white">Close price / SMA 14</h3>
+                    <h3 className="mt-1 text-xl font-semibold text-white">Close price / SMA 14 / EMA 14</h3>
                   </div>
-                  <div className="flex gap-4 text-xs text-slate-400">
+                  <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs text-slate-400">
+                    <span><i className="mr-1 inline-block h-2 w-2 rounded-full bg-emerald-400" />Bullish candle</span>
+                    <span><i className="mr-1 inline-block h-2 w-2 rounded-full bg-rose-400" />Bearish candle</span>
                     <span><i className="mr-1 inline-block h-2 w-2 rounded-full bg-slate-400" />Close</span>
                     <span><i className="mr-1 inline-block h-2 w-2 rounded-full bg-cyan-400" />SMA 14</span>
                     <span><i className="mr-1 inline-block h-2 w-2 rounded-full bg-amber-400" />EMA 14</span>
+                    <span><i className="mr-1 inline-block h-2 w-2 rounded-full bg-slate-500" />Volume</span>
                   </div>
                 </div>
-                <SmaChart values={smaValues} emaValues={emaValues} />
+                <SmaChart
+                  values={smaValues}
+                  emaValues={emaValues}
+                  candles={candles}
+                  visibleCandles={visibleCandles}
+                />
               </section>
 
               <section className="rounded-3xl border border-slate-800/80 bg-slate-900/80 p-5 shadow-[0_12px_40px_rgba(15,23,42,0.35)]">

@@ -1,0 +1,36 @@
+[
+  {
+    "route": "/market",
+    "firstLoadUncompressedJsBytes": 470678,
+    "firstLoadChunkPaths": [
+      ".next-trading-lab\\static\\chunks\\3fntmmi971322.js",
+      ".next-trading-lab\\static\\chunks\\1lky_3pmct_d6.js",
+      ".next-trading-lab\\static\\chunks\\3l04zcqx63h3y.js",
+      ".next-trading-lab\\static\\chunks\\0cegfsgm6lvdz.js",
+      ".next-trading-lab\\static\\chunks\\3byuobrkyz9bj.js",
+      ".next-trading-lab\\static\\chunks\\turbopack-3eyf67d9t5dl9.js"
+    ]
+  },
+  {
+    "route": "/",
+    "firstLoadUncompressedJsBytes": 453121,
+    "firstLoadChunkPaths": [
+      ".next-trading-lab\\static\\chunks\\3fntmmi971322.js",
+      ".next-trading-lab\\static\\chunks\\3l04zcqx63h3y.js",
+      ".next-trading-lab\\static\\chunks\\0cegfsgm6lvdz.js",
+      ".next-trading-lab\\static\\chunks\\3byuobrkyz9bj.js",
+      ".next-trading-lab\\static\\chunks\\turbopack-3eyf67d9t5dl9.js"
+    ]
+  },
+  {
+    "route": "/_not-found",
+    "firstLoadUncompressedJsBytes": 453121,
+    "firstLoadChunkPaths": [
+      ".next-trading-lab\\static\\chunks\\3fntmmi971322.js",
+      ".next-trading-lab\\static\\chunks\\3l04zcqx63h3y.js",
+      ".next-trading-lab\\static\\chunks\\0cegfsgm6lvdz.js",
+      ".next-trading-lab\\static\\chunks\\3byuobrkyz9bj.js",
+      ".next-trading-lab\\static\\chunks\\turbopack-3eyf67d9t5dl9.js"
+    ]
+  }
+]

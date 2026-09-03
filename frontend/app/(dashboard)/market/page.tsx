@@ -36,13 +36,24 @@ type SyncResponse = { data: {
                         status: string; 
                         timestamp: string }
 };
+type SmaResponse = {
+  data: {
+    period: number;
+    values: Array<{ datetime: string; close: number; sma: number | null }>;
+  };
+};
+type EmaResponse = {
+  data: {
+    values: Array<{ datetime: string; close: number; ema: number | null }>;
+  };
+};
 
 const DEFAULT_SYMBOL = 'AAPL';
 const DEFAULT_INTERVAL = '1day';
 const API_BASE = 'http://localhost:4000';
 
 function CandlestickChart({ candles }: { candles: Candle[] }) {
-  const chartCandles = candles.slice(-20);
+  const chartCandles = candles.slice(-30);
 
   if (!chartCandles.length) {
     return (
@@ -108,14 +119,103 @@ function CandlestickChart({ candles }: { candles: Candle[] }) {
   );
 }
 
+function VolumeChart({ candles }: { candles: Candle[] }) {
+  const chartCandles = candles.slice(-30);
+  const volumes = chartCandles.map((candle) => candle.volume ?? 0);
+  const maxVolume = Math.max(...volumes, 0);
+
+  if (!chartCandles.length || maxVolume === 0) {
+    return (
+      <div className="flex h-28 items-center justify-center rounded-2xl border border-slate-800 bg-slate-950/80 text-sm text-slate-400">
+        No volume data available
+      </div>
+    );
+  }
+
+  const width = 780;
+  const height = 120;
+  const padding = 16;
+  const step = (width - padding * 2) / chartCandles.length;
+
+  return (
+    <svg viewBox={`0 0 ${width} ${height}`} className="h-32 w-full rounded-2xl bg-slate-950/80">
+      {chartCandles.map((candle, index) => {
+        const volume = candle.volume ?? 0;
+        const barHeight = (volume / maxVolume) * (height - padding * 2);
+        const x = padding + index * step + step * 0.2;
+
+        return (
+          <rect
+            key={`${candle.datetime}-${index}`}
+            x={x}
+            y={height - padding - barHeight}
+            width={Math.max(step * 0.6, 4)}
+            height={barHeight}
+            rx={2}
+            fill={candle.close >= candle.open ? '#22c55e' : '#f87171'}
+            opacity={0.8}
+          />
+        );
+      })}
+    </svg>
+  );
+}
+
+function SmaChart({ values, emaValues }: { values: SmaResponse['data']['values']; emaValues: EmaResponse['data']['values'] }) {
+  const chartValues = values.slice(-30);
+  const validSmaValues = chartValues.filter((value) => value.sma !== null);
+
+  if (!chartValues.length || !validSmaValues.length) {
+    return (
+      <div className="flex h-40 items-center justify-center rounded-2xl border border-slate-800 bg-slate-950/80 text-sm text-slate-400">
+        Not enough data for SMA 14
+      </div>
+    );
+  }
+
+  const width = 780;
+  const height = 160;
+  const padding = 20;
+  const prices = chartValues.flatMap((value) => [value.close, value.sma ?? value.close]);
+  const min = Math.min(...prices);
+  const max = Math.max(...prices);
+  const range = max - min || 1;
+  const xStep = (width - padding * 2) / Math.max(chartValues.length - 1, 1);
+  const toPoint = (value: number, index: number) => `${padding + index * xStep},${padding + ((max - value) / range) * (height - padding * 2)}`;
+  const closePoints = chartValues.map((value, index) => toPoint(value.close, index)).join(' ');
+  const smaPoints = chartValues
+    .map((value, index) => value.sma === null ? null : toPoint(value.sma, index))
+    .filter((point): point is string => point !== null)
+    .join(' ');
+  const emaByDate = new Map(emaValues.map((value) => [value.datetime, value.ema]));
+  const emaPoints = chartValues
+    .map((value, index) => {
+      const ema = emaByDate.get(value.datetime);
+      return ema === null || ema === undefined ? null : toPoint(ema, index);
+    })
+    .filter((point): point is string => point !== null)
+    .join(' ');
+
+  return (
+    <svg viewBox={`0 0 ${width} ${height}`} className="h-44 w-full rounded-2xl bg-slate-950/80">
+      <polyline points={closePoints} fill="none" stroke="#94a3b8" strokeWidth="2" />
+      <polyline points={smaPoints} fill="none" stroke="#22d3ee" strokeWidth="2.5" />
+      <polyline points={emaPoints} fill="none" stroke="#f59e0b" strokeWidth="2.5" />
+    </svg>
+  );
+}
+
 export default function MarketPage() {
   const [symbol, setSymbol] = useState(DEFAULT_SYMBOL);
   const [interval, setInterval] = useState(DEFAULT_INTERVAL);
   const [quote, setQuote] = useState<Quote | null>(null);
   const [candles, setCandles] = useState<Candle[]>([]);
+  const [smaValues, setSmaValues] = useState<SmaResponse['data']['values']>([]);
+  const [emaValues, setEmaValues] = useState<EmaResponse['data']['values']>([]);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [syncMessage, setSyncMessage] = useState<string | null>(null);
 
   const latestCandle = useMemo(() => candles[candles.length - 1], [candles]);
 
@@ -128,17 +228,25 @@ export default function MarketPage() {
         fetch(`${API_BASE}/api/market/quote/${selectedSymbol}`),
         fetch(`${API_BASE}/api/market/candles/${selectedSymbol}?interval=${interval}&limit=30`),
       ]);
+      const smaRes = await fetch(`${API_BASE}/api/indicators/sma/${selectedSymbol}?interval=${interval}&period=14`);
+      const emaRes = await fetch(`${API_BASE}/api/indicators/ema/${selectedSymbol}?interval=${interval}&period=14`);
 
-      if (!quoteRes.ok || !candlesRes.ok) {
-        const quoteText = quoteRes.ok ? await candlesRes.text() : await quoteRes.text();
+      if (!quoteRes.ok || !candlesRes.ok || !smaRes.ok || !emaRes.ok) {
+        const quoteText = quoteRes.ok
+          ? candlesRes.ok ? smaRes.ok ? await emaRes.text() : await smaRes.text() : await candlesRes.text()
+          : await quoteRes.text();
         throw new Error(quoteText || 'Unable to load market data');
       }
 
       const quotePayload = (await quoteRes.json()) as QuoteResponse;
       const candlesPayload = (await candlesRes.json()) as CandlesResponse;
+      const smaPayload = (await smaRes.json()) as SmaResponse;
+      const emaPayload = (await emaRes.json()) as EmaResponse;
 
       setQuote(quotePayload.data);
       setCandles(candlesPayload.data?.data ?? []);
+      setSmaValues(smaPayload.data?.values ?? []);
+      setEmaValues(emaPayload.data?.values ?? []);
     } catch (loadError) {
       const message = loadError instanceof Error ? loadError.message : 'Unknown market error';
       setError(message);
@@ -148,18 +256,20 @@ export default function MarketPage() {
   };
 
   useEffect(() => {
-    void loadMarketData(DEFAULT_SYMBOL);
+    void Promise.resolve().then(() => loadMarketData(DEFAULT_SYMBOL));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setSyncMessage(null);
     await loadMarketData(symbol.trim() || DEFAULT_SYMBOL);
   };
 
   const handleSync = async () => {
     setSyncing(true);
     setError(null);
+    setSyncMessage(null);
 
     try {
       const response = await fetch(`${API_BASE}/api/sync/assets/${symbol.trim() || DEFAULT_SYMBOL}?interval=${interval}&outputsize=30`, {
@@ -172,7 +282,11 @@ export default function MarketPage() {
         throw new Error('error' in payload && payload.error ? payload.error : 'Sync failed');
       }
 
+      const syncedData = 'data' in payload ? payload.data : null;
       await loadMarketData(symbol.trim() || DEFAULT_SYMBOL);
+      setSyncMessage(
+        `Datos guardados en la BBDD: ${syncedData?.candlesInserted ?? 0} new candles.`
+      );
     } catch (syncError) {
       const message = syncError instanceof Error ? syncError.message : 'Unable to sync market data';
       setError(message);
@@ -279,6 +393,12 @@ export default function MarketPage() {
             </div>
           ) : null}
 
+          {syncMessage ? (
+            <div className="rounded-2xl border border-emerald-500/40 bg-emerald-500/10 p-4 text-emerald-200 shadow-lg shadow-emerald-950/20">
+              {syncMessage}
+            </div>
+          ) : null}
+
           {loading ? (
             <div className="rounded-3xl border border-slate-800 bg-slate-900/80 p-10 text-slate-300 shadow-[0_12px_40px_rgba(15,23,42,0.45)]">
               <div className="flex items-center gap-3">
@@ -329,6 +449,26 @@ export default function MarketPage() {
                   <span className="rounded-full border border-slate-700 bg-slate-950/70 px-2.5 py-1 text-xs text-slate-300">{candles.length} candles</span>
                 </div>
                 <CandlestickChart candles={candles} />
+                <div className="mt-3 flex items-center justify-between">
+                  <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Volume</p>
+                  <span className="text-xs text-slate-500">Last 30 candles</span>
+                </div>
+                <VolumeChart candles={candles} />
+              </section>
+
+              <section className="rounded-3xl border border-slate-800/80 bg-slate-900/80 p-5 shadow-[0_12px_40px_rgba(15,23,42,0.35)]">
+                <div className="mb-4 flex items-center justify-between">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Technical indicator</p>
+                    <h3 className="mt-1 text-xl font-semibold text-white">Close price / SMA 14</h3>
+                  </div>
+                  <div className="flex gap-4 text-xs text-slate-400">
+                    <span><i className="mr-1 inline-block h-2 w-2 rounded-full bg-slate-400" />Close</span>
+                    <span><i className="mr-1 inline-block h-2 w-2 rounded-full bg-cyan-400" />SMA 14</span>
+                    <span><i className="mr-1 inline-block h-2 w-2 rounded-full bg-amber-400" />EMA 14</span>
+                  </div>
+                </div>
+                <SmaChart values={smaValues} emaValues={emaValues} />
               </section>
 
               <section className="rounded-3xl border border-slate-800/80 bg-slate-900/80 p-5 shadow-[0_12px_40px_rgba(15,23,42,0.35)]">

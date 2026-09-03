@@ -5,7 +5,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/app.ts",
+    "db:up": "docker compose --env-file ../.env -f ../compose.yaml up -d postgres",
+    "dev": "npm run db:up && tsx watch src/app.ts",
     "build": "tsc",
     "start": "node dist/app.js",
     "test": "echo \"Tests not configured yet\""

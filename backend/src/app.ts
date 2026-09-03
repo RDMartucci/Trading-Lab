@@ -111,6 +111,37 @@ app.get("/api/indicators/sma/:symbol", async (req, res) => {
   }
 });
 
+app.get("/api/indicators/ema/:symbol", async (req, res) => {
+  try {
+    const interval = typeof req.query.interval === "string" ? req.query.interval : "1day";
+    const period = typeof req.query.period === "string" ? Number(req.query.period) : 14;
+
+    if (!Number.isInteger(period) || period <= 0) {
+      res.status(400).json({ error: "period must be a positive integer." });
+      return;
+    }
+
+    const result = await marketIndicatorService.getEma(req.params.symbol, interval, period);
+    res.json({ data: result });
+  } catch (error) {
+    if (error instanceof Error && error.message === "TWELVE_DATA_API_KEY_MISSING") {
+      res.status(503).json({ error: "Market data provider is not configured." });
+      return;
+    }
+    if (error instanceof Error && error.message === "SYMBOL_REQUIRED") {
+      res.status(400).json({ error: "A market symbol is required." });
+      return;
+    }
+    if (error instanceof Error && error.message === "PERIOD_MUST_BE_POSITIVE_INTEGER") {
+      res.status(400).json({ error: "period must be a positive integer." });
+      return;
+    }
+
+    console.error("Unexpected EMA indicator error", error);
+    res.status(502).json({ error: "Unable to compute EMA indicator." });
+  }
+});
+
 // Verify database connection and start server
 pool.query("SELECT NOW()")
   .then(() => {

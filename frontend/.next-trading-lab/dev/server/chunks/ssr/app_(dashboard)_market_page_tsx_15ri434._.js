@@ -14,15 +14,15 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist
 const DEFAULT_SYMBOL = 'AAPL';
 const DEFAULT_INTERVAL = '1day';
 const API_BASE = 'http://localhost:4000';
-function CandlestickChart({ candles, visibleCandles }) {
-    const chartCandles = candles.slice(-visibleCandles);
+function CandlestickChart({ candles, visibleCandles, windowStart }) {
+    const chartCandles = candles.slice(windowStart, windowStart + visibleCandles);
     if (!chartCandles.length) {
         return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
             className: "flex h-56 items-center justify-center rounded-2xl border border-slate-800 bg-slate-950/80 text-sm text-slate-400",
             children: "No chart data available"
         }, void 0, false, {
             fileName: "[project]/app/(dashboard)/market/page.tsx",
-            lineNumber: 60,
+            lineNumber: 66,
             columnNumber: 7
         }, this);
     }
@@ -39,6 +39,34 @@ function CandlestickChart({ candles, visibleCandles }) {
         viewBox: `0 0 ${width} ${height}`,
         className: "h-64 w-full rounded-2xl bg-slate-950/80",
         children: [
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("text", {
+                x: padding,
+                y: 14,
+                fill: "#cbd5e1",
+                fontSize: "11",
+                children: [
+                    "High ",
+                    max.toFixed(2)
+                ]
+            }, void 0, true, {
+                fileName: "[project]/app/(dashboard)/market/page.tsx",
+                lineNumber: 84,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("text", {
+                x: padding,
+                y: height - 6,
+                fill: "#cbd5e1",
+                fontSize: "11",
+                children: [
+                    "Low ",
+                    min.toFixed(2)
+                ]
+            }, void 0, true, {
+                fileName: "[project]/app/(dashboard)/market/page.tsx",
+                lineNumber: 85,
+                columnNumber: 7
+            }, this),
             [
                 0,
                 0.25,
@@ -56,7 +84,7 @@ function CandlestickChart({ candles, visibleCandles }) {
                     strokeDasharray: "4 4"
                 }, ratio, false, {
                     fileName: "[project]/app/(dashboard)/market/page.tsx",
-                    lineNumber: 81,
+                    lineNumber: 89,
                     columnNumber: 11
                 }, this);
             }),
@@ -80,7 +108,7 @@ function CandlestickChart({ candles, visibleCandles }) {
                             strokeWidth: 1.5
                         }, void 0, false, {
                             fileName: "[project]/app/(dashboard)/market/page.tsx",
-                            lineNumber: 105,
+                            lineNumber: 113,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
@@ -93,25 +121,25 @@ function CandlestickChart({ candles, visibleCandles }) {
                             opacity: 0.9
                         }, void 0, false, {
                             fileName: "[project]/app/(dashboard)/market/page.tsx",
-                            lineNumber: 106,
+                            lineNumber: 114,
                             columnNumber: 13
                         }, this)
                     ]
                 }, `${candle.datetime}-${index}`, true, {
                     fileName: "[project]/app/(dashboard)/market/page.tsx",
-                    lineNumber: 104,
+                    lineNumber: 112,
                     columnNumber: 11
                 }, this);
             })
         ]
     }, void 0, true, {
         fileName: "[project]/app/(dashboard)/market/page.tsx",
-        lineNumber: 77,
+        lineNumber: 83,
         columnNumber: 5
     }, this);
 }
-function VolumeChart({ candles, visibleCandles }) {
-    const chartCandles = candles.slice(-visibleCandles);
+function VolumeChart({ candles, visibleCandles, windowStart }) {
+    const chartCandles = candles.slice(windowStart, windowStart + visibleCandles);
     const volumes = chartCandles.map((candle)=>candle.volume ?? 0);
     const maxVolume = Math.max(...volumes, 0);
     if (!chartCandles.length || maxVolume === 0) {
@@ -120,7 +148,7 @@ function VolumeChart({ candles, visibleCandles }) {
             children: "No volume data available"
         }, void 0, false, {
             fileName: "[project]/app/(dashboard)/market/page.tsx",
-            lineNumber: 129,
+            lineNumber: 137,
             columnNumber: 7
         }, this);
     }
@@ -131,49 +159,79 @@ function VolumeChart({ candles, visibleCandles }) {
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
         viewBox: `0 0 ${width} ${height}`,
         className: "h-32 w-full rounded-2xl bg-slate-950/80",
-        children: chartCandles.map((candle, index)=>{
-            const volume = candle.volume ?? 0;
-            const barHeight = volume / maxVolume * (height - padding * 2);
-            const x = padding + index * step + step * 0.2;
-            return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
-                x: x,
-                y: height - padding - barHeight,
-                width: Math.max(step * 0.6, 4),
-                height: barHeight,
-                rx: 2,
-                fill: candle.close >= candle.open ? '#22c55e' : '#f87171',
-                opacity: 0.8
-            }, `${candle.datetime}-${index}`, false, {
+        children: [
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("text", {
+                x: padding,
+                y: 12,
+                fill: "#cbd5e1",
+                fontSize: "11",
+                children: [
+                    "Max ",
+                    maxVolume.toLocaleString()
+                ]
+            }, void 0, true, {
                 fileName: "[project]/app/(dashboard)/market/page.tsx",
-                lineNumber: 148,
-                columnNumber: 11
-            }, this);
-        })
-    }, void 0, false, {
+                lineNumber: 150,
+                columnNumber: 7
+            }, this),
+            chartCandles.map((candle, index)=>{
+                const volume = candle.volume ?? 0;
+                const barHeight = volume / maxVolume * (height - padding * 2);
+                const x = padding + index * step + step * 0.2;
+                return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
+                    x: x,
+                    y: height - padding - barHeight,
+                    width: Math.max(step * 0.6, 4),
+                    height: barHeight,
+                    rx: 2,
+                    fill: candle.close >= candle.open ? '#22c55e' : '#f87171',
+                    opacity: 0.8
+                }, `${candle.datetime}-${index}`, false, {
+                    fileName: "[project]/app/(dashboard)/market/page.tsx",
+                    lineNumber: 157,
+                    columnNumber: 11
+                }, this);
+            })
+        ]
+    }, void 0, true, {
         fileName: "[project]/app/(dashboard)/market/page.tsx",
-        lineNumber: 141,
+        lineNumber: 149,
         columnNumber: 5
     }, this);
 }
-function SmaChart({ values, emaValues, candles, visibleCandles }) {
-    const chartValues = values.slice(-visibleCandles);
-    const validSmaValues = chartValues.filter((value)=>value.sma !== null);
+function SmaChart({ values, emaValues, candles, visibleCandles, windowStart, showSma, showEma }) {
+    const visibleData = candles.slice(windowStart, windowStart + visibleCandles);
+    const valuesByDate = new Map(values.map((value)=>[
+            value.datetime,
+            value
+        ]));
+    const chartValues = visibleData.map((candle)=>valuesByDate.get(candle.datetime)).filter((value)=>value !== undefined);
+    const validSmaValues = chartValues.filter((value)=>showSma && value.sma !== null || showEma && emaValues.some((ema)=>ema.datetime === value.datetime && ema.ema !== null));
     if (!chartValues.length || !validSmaValues.length) {
         return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
             className: "flex h-40 items-center justify-center rounded-2xl border border-slate-800 bg-slate-950/80 text-sm text-slate-400",
             children: "Not enough data for SMA 14"
         }, void 0, false, {
             fileName: "[project]/app/(dashboard)/market/page.tsx",
-            lineNumber: 170,
+            lineNumber: 183,
             columnNumber: 7
         }, this);
     }
     const width = 780;
     const height = 160;
     const padding = 20;
+    const emaByDate = new Map(emaValues.map((value)=>[
+            value.datetime,
+            value.ema
+        ]));
     const prices = chartValues.flatMap((value)=>[
             value.close,
-            value.sma ?? value.close
+            ...showSma && value.sma !== null ? [
+                value.sma
+            ] : [],
+            ...showEma && emaByDate.get(value.datetime) !== null && emaByDate.get(value.datetime) !== undefined ? [
+                emaByDate.get(value.datetime)
+            ] : []
         ]);
     const min = Math.min(...prices);
     const max = Math.max(...prices);
@@ -181,15 +239,11 @@ function SmaChart({ values, emaValues, candles, visibleCandles }) {
     const xStep = (width - padding * 2) / Math.max(chartValues.length - 1, 1);
     const toPoint = (value, index)=>`${padding + index * xStep},${padding + (max - value) / range * (height - padding * 2)}`;
     const closePoints = chartValues.map((value, index)=>toPoint(value.close, index)).join(' ');
-    const smaPoints = chartValues.map((value, index)=>value.sma === null ? null : toPoint(value.sma, index)).filter((point)=>point !== null).join(' ');
-    const emaByDate = new Map(emaValues.map((value)=>[
-            value.datetime,
-            value.ema
-        ]));
-    const emaPoints = chartValues.map((value, index)=>{
+    const smaPoints = showSma ? chartValues.map((value, index)=>value.sma === null ? null : toPoint(value.sma, index)).filter((point)=>point !== null).join(' ') : '';
+    const emaPoints = showEma ? chartValues.map((value, index)=>{
         const ema = emaByDate.get(value.datetime);
         return ema === null || ema === undefined ? null : toPoint(ema, index);
-    }).filter((point)=>point !== null).join(' ');
+    }).filter((point)=>point !== null).join(' ') : '';
     const candleByDate = new Map(candles.map((candle)=>[
             candle.datetime,
             candle
@@ -199,6 +253,34 @@ function SmaChart({ values, emaValues, candles, visibleCandles }) {
         viewBox: `0 0 ${width} ${height}`,
         className: "h-44 w-full rounded-2xl bg-slate-950/80",
         children: [
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("text", {
+                x: padding,
+                y: 14,
+                fill: "#cbd5e1",
+                fontSize: "11",
+                children: [
+                    "High ",
+                    max.toFixed(2)
+                ]
+            }, void 0, true, {
+                fileName: "[project]/app/(dashboard)/market/page.tsx",
+                lineNumber: 219,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("text", {
+                x: padding,
+                y: height - 4,
+                fill: "#cbd5e1",
+                fontSize: "11",
+                children: [
+                    "Low ",
+                    min.toFixed(2)
+                ]
+            }, void 0, true, {
+                fileName: "[project]/app/(dashboard)/market/page.tsx",
+                lineNumber: 220,
+                columnNumber: 7
+            }, this),
             chartValues.map((value, index)=>{
                 const candle = candleByDate.get(value.datetime);
                 const volume = candle?.volume ?? 0;
@@ -214,7 +296,7 @@ function SmaChart({ values, emaValues, candles, visibleCandles }) {
                     opacity: 0.45
                 }, `volume-${value.datetime}`, false, {
                     fileName: "[project]/app/(dashboard)/market/page.tsx",
-                    lineNumber: 210,
+                    lineNumber: 228,
                     columnNumber: 11
                 }, this);
             }),
@@ -225,29 +307,29 @@ function SmaChart({ values, emaValues, candles, visibleCandles }) {
                 strokeWidth: "2"
             }, void 0, false, {
                 fileName: "[project]/app/(dashboard)/market/page.tsx",
-                lineNumber: 222,
+                lineNumber: 240,
                 columnNumber: 7
             }, this),
-            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("polyline", {
+            showSma ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("polyline", {
                 points: smaPoints,
                 fill: "none",
                 stroke: "#22d3ee",
                 strokeWidth: "2.5"
             }, void 0, false, {
                 fileName: "[project]/app/(dashboard)/market/page.tsx",
-                lineNumber: 223,
-                columnNumber: 7
-            }, this),
-            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("polyline", {
+                lineNumber: 241,
+                columnNumber: 18
+            }, this) : null,
+            showEma ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("polyline", {
                 points: emaPoints,
                 fill: "none",
                 stroke: "#f59e0b",
                 strokeWidth: "2.5"
             }, void 0, false, {
                 fileName: "[project]/app/(dashboard)/market/page.tsx",
-                lineNumber: 224,
-                columnNumber: 7
-            }, this),
+                lineNumber: 242,
+                columnNumber: 18
+            }, this) : null,
             chartValues.map((value, index)=>{
                 const candle = candleByDate.get(value.datetime);
                 return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("circle", {
@@ -257,14 +339,73 @@ function SmaChart({ values, emaValues, candles, visibleCandles }) {
                     fill: candle && candle.close >= candle.open ? '#22c55e' : '#f87171'
                 }, `close-${value.datetime}`, false, {
                     fileName: "[project]/app/(dashboard)/market/page.tsx",
-                    lineNumber: 228,
+                    lineNumber: 246,
                     columnNumber: 11
                 }, this);
             })
         ]
     }, void 0, true, {
         fileName: "[project]/app/(dashboard)/market/page.tsx",
-        lineNumber: 202,
+        lineNumber: 218,
+        columnNumber: 5
+    }, this);
+}
+function RsiChart({ values, visibleCandles, windowStart }) {
+    const chartValues = values.slice(windowStart, windowStart + visibleCandles);
+    const validValues = chartValues.filter((value)=>value.rsi !== null);
+    if (!validValues.length) {
+        return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: "flex h-40 items-center justify-center rounded-2xl border border-slate-800 bg-slate-950/80 text-sm text-slate-400",
+            children: "Not enough data for RSI 14"
+        }, void 0, false, {
+            fileName: "[project]/app/(dashboard)/market/page.tsx",
+            lineNumber: 264,
+            columnNumber: 12
+        }, this);
+    }
+    const width = 780;
+    const height = 160;
+    const padding = 20;
+    const xStep = (width - padding * 2) / Math.max(chartValues.length - 1, 1);
+    const point = (value, index)=>`${padding + index * xStep},${padding + (100 - value) / 100 * (height - padding * 2)}`;
+    const rsiPoints = chartValues.map((value, index)=>value.rsi === null ? null : point(value.rsi, index)).filter((value)=>value !== null).join(' ');
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+        viewBox: `0 0 ${width} ${height}`,
+        className: "h-44 w-full rounded-2xl bg-slate-950/80",
+        children: [
+            [
+                30,
+                50,
+                70
+            ].map((level)=>{
+                const y = padding + (100 - level) / 100 * (height - padding * 2);
+                return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("line", {
+                    x1: padding,
+                    x2: width - padding,
+                    y1: y,
+                    y2: y,
+                    stroke: level === 50 ? 'rgba(148, 163, 184, 0.2)' : 'rgba(245, 158, 11, 0.35)',
+                    strokeDasharray: "4 4"
+                }, level, false, {
+                    fileName: "[project]/app/(dashboard)/market/page.tsx",
+                    lineNumber: 278,
+                    columnNumber: 16
+                }, this);
+            }),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("polyline", {
+                points: rsiPoints,
+                fill: "none",
+                stroke: "#a78bfa",
+                strokeWidth: "2.5"
+            }, void 0, false, {
+                fileName: "[project]/app/(dashboard)/market/page.tsx",
+                lineNumber: 280,
+                columnNumber: 7
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "[project]/app/(dashboard)/market/page.tsx",
+        lineNumber: 275,
         columnNumber: 5
     }, this);
 }
@@ -275,11 +416,18 @@ function MarketPage() {
     const [candles, setCandles] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])([]);
     const [smaValues, setSmaValues] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])([]);
     const [emaValues, setEmaValues] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])([]);
+    const [rsiValues, setRsiValues] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])([]);
+    const [selectedIndicators, setSelectedIndicators] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])([
+        'sma',
+        'ema',
+        'rsi'
+    ]);
     const [loading, setLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(true);
     const [syncing, setSyncing] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
     const [error, setError] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
     const [syncMessage, setSyncMessage] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
-    const [visibleCandles, setVisibleCandles] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(30);
+    const [visibleCandles, setVisibleCandles] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(10);
+    const [windowStart, setWindowStart] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(0);
     const latestCandle = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useMemo"])(()=>candles[candles.length - 1], [
         candles
     ]);
@@ -293,18 +441,22 @@ function MarketPage() {
             ]);
             const smaRes = await fetch(`${API_BASE}/api/indicators/sma/${selectedSymbol}?interval=${interval}&period=14`);
             const emaRes = await fetch(`${API_BASE}/api/indicators/ema/${selectedSymbol}?interval=${interval}&period=14`);
-            if (!quoteRes.ok || !candlesRes.ok || !smaRes.ok || !emaRes.ok) {
-                const quoteText = quoteRes.ok ? candlesRes.ok ? smaRes.ok ? await emaRes.text() : await smaRes.text() : await candlesRes.text() : await quoteRes.text();
+            const rsiRes = await fetch(`${API_BASE}/api/indicators/rsi/${selectedSymbol}?interval=${interval}&period=14`);
+            if (!quoteRes.ok || !candlesRes.ok || !smaRes.ok || !emaRes.ok || !rsiRes.ok) {
+                const quoteText = quoteRes.ok ? candlesRes.ok ? smaRes.ok ? emaRes.ok ? await rsiRes.text() : await emaRes.text() : await smaRes.text() : await candlesRes.text() : await quoteRes.text();
                 throw new Error(quoteText || 'Unable to load market data');
             }
             const quotePayload = await quoteRes.json();
             const candlesPayload = await candlesRes.json();
             const smaPayload = await smaRes.json();
             const emaPayload = await emaRes.json();
+            const rsiPayload = await rsiRes.json();
             setQuote(quotePayload.data);
             setCandles(candlesPayload.data?.data ?? []);
             setSmaValues(smaPayload.data?.values ?? []);
             setEmaValues(emaPayload.data?.values ?? []);
+            setRsiValues(rsiPayload.data?.values ?? []);
+            setWindowStart(0);
         } catch (loadError) {
             const message = loadError instanceof Error ? loadError.message : 'Unknown market error';
             setError(message);
@@ -360,7 +512,7 @@ function MarketPage() {
                                     children: "T"
                                 }, void 0, false, {
                                     fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                    lineNumber: 339,
+                                    lineNumber: 390,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -370,7 +522,7 @@ function MarketPage() {
                                             children: "Terminal"
                                         }, void 0, false, {
                                             fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                            lineNumber: 343,
+                                            lineNumber: 394,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
@@ -378,19 +530,19 @@ function MarketPage() {
                                             children: "Trading Lab"
                                         }, void 0, false, {
                                             fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                            lineNumber: 344,
+                                            lineNumber: 395,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                    lineNumber: 342,
+                                    lineNumber: 393,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/(dashboard)/market/page.tsx",
-                            lineNumber: 338,
+                            lineNumber: 389,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("nav", {
@@ -409,7 +561,7 @@ function MarketPage() {
                                             children: item
                                         }, void 0, false, {
                                             fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                            lineNumber: 355,
+                                            lineNumber: 406,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -420,18 +572,18 @@ function MarketPage() {
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                            lineNumber: 356,
+                                            lineNumber: 407,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, item, true, {
                                     fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                    lineNumber: 350,
+                                    lineNumber: 401,
                                     columnNumber: 15
                                 }, this))
                         }, void 0, false, {
                             fileName: "[project]/app/(dashboard)/market/page.tsx",
-                            lineNumber: 348,
+                            lineNumber: 399,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -442,7 +594,7 @@ function MarketPage() {
                                     children: "Market status"
                                 }, void 0, false, {
                                     fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                    lineNumber: 362,
+                                    lineNumber: 413,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -452,7 +604,7 @@ function MarketPage() {
                                             className: "h-2.5 w-2.5 rounded-full bg-emerald-400"
                                         }, void 0, false, {
                                             fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                            lineNumber: 364,
+                                            lineNumber: 415,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -460,25 +612,25 @@ function MarketPage() {
                                             children: "Live feed connected"
                                         }, void 0, false, {
                                             fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                            lineNumber: 365,
+                                            lineNumber: 416,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                    lineNumber: 363,
+                                    lineNumber: 414,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/(dashboard)/market/page.tsx",
-                            lineNumber: 361,
+                            lineNumber: 412,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/(dashboard)/market/page.tsx",
-                    lineNumber: 337,
+                    lineNumber: 388,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -496,7 +648,7 @@ function MarketPage() {
                                                 children: "Market overview"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                lineNumber: 374,
+                                                lineNumber: 425,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
@@ -504,13 +656,13 @@ function MarketPage() {
                                                 children: quote?.symbol ?? symbol
                                             }, void 0, false, {
                                                 fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                lineNumber: 375,
+                                                lineNumber: 426,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                        lineNumber: 373,
+                                        lineNumber: 424,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
@@ -524,7 +676,7 @@ function MarketPage() {
                                                 className: "rounded-xl border border-slate-700/80 bg-slate-950/80 px-4 py-2.5 text-base text-white outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/20"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                lineNumber: 379,
+                                                lineNumber: 430,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
@@ -537,7 +689,7 @@ function MarketPage() {
                                                         children: "1min"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                        lineNumber: 391,
+                                                        lineNumber: 442,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -545,7 +697,7 @@ function MarketPage() {
                                                         children: "5min"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                        lineNumber: 392,
+                                                        lineNumber: 443,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -553,7 +705,7 @@ function MarketPage() {
                                                         children: "15min"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                        lineNumber: 393,
+                                                        lineNumber: 444,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -561,7 +713,7 @@ function MarketPage() {
                                                         children: "30min"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                        lineNumber: 394,
+                                                        lineNumber: 445,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -569,7 +721,7 @@ function MarketPage() {
                                                         children: "45min"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                        lineNumber: 395,
+                                                        lineNumber: 446,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -577,7 +729,7 @@ function MarketPage() {
                                                         children: "1h"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                        lineNumber: 396,
+                                                        lineNumber: 447,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -585,7 +737,7 @@ function MarketPage() {
                                                         children: "2h"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                        lineNumber: 397,
+                                                        lineNumber: 448,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -593,7 +745,7 @@ function MarketPage() {
                                                         children: "4h"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                        lineNumber: 398,
+                                                        lineNumber: 449,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -601,7 +753,7 @@ function MarketPage() {
                                                         children: "8h"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                        lineNumber: 399,
+                                                        lineNumber: 450,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -609,7 +761,7 @@ function MarketPage() {
                                                         children: "1day"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                        lineNumber: 400,
+                                                        lineNumber: 451,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -617,7 +769,7 @@ function MarketPage() {
                                                         children: "1week"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                        lineNumber: 401,
+                                                        lineNumber: 452,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -625,13 +777,13 @@ function MarketPage() {
                                                         children: "1month"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                        lineNumber: 402,
+                                                        lineNumber: 453,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                lineNumber: 386,
+                                                lineNumber: 437,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -640,7 +792,7 @@ function MarketPage() {
                                                 children: "Load"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                lineNumber: 405,
+                                                lineNumber: 456,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -651,24 +803,24 @@ function MarketPage() {
                                                 children: syncing ? 'Syncing...' : 'Sync data'
                                             }, void 0, false, {
                                                 fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                lineNumber: 412,
+                                                lineNumber: 463,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                        lineNumber: 378,
+                                        lineNumber: 429,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                lineNumber: 372,
+                                lineNumber: 423,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/(dashboard)/market/page.tsx",
-                            lineNumber: 371,
+                            lineNumber: 422,
                             columnNumber: 11
                         }, this),
                         error ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -676,7 +828,7 @@ function MarketPage() {
                             children: error
                         }, void 0, false, {
                             fileName: "[project]/app/(dashboard)/market/page.tsx",
-                            lineNumber: 425,
+                            lineNumber: 476,
                             columnNumber: 13
                         }, this) : null,
                         syncMessage ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -684,7 +836,7 @@ function MarketPage() {
                             children: syncMessage
                         }, void 0, false, {
                             fileName: "[project]/app/(dashboard)/market/page.tsx",
-                            lineNumber: 431,
+                            lineNumber: 482,
                             columnNumber: 13
                         }, this) : null,
                         loading ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -696,25 +848,25 @@ function MarketPage() {
                                         className: "h-3 w-3 animate-pulse rounded-full bg-cyan-400"
                                     }, void 0, false, {
                                         fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                        lineNumber: 439,
+                                        lineNumber: 490,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                         children: "Loading market data..."
                                     }, void 0, false, {
                                         fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                        lineNumber: 440,
+                                        lineNumber: 491,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                lineNumber: 438,
+                                lineNumber: 489,
                                 columnNumber: 15
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/(dashboard)/market/page.tsx",
-                            lineNumber: 437,
+                            lineNumber: 488,
                             columnNumber: 13
                         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
                             children: [
@@ -729,7 +881,7 @@ function MarketPage() {
                                                     children: "Last price"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                    lineNumber: 447,
+                                                    lineNumber: 498,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -737,7 +889,7 @@ function MarketPage() {
                                                     children: quote?.price != null ? `$${quote.price.toFixed(2)}` : '—'
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                    lineNumber: 448,
+                                                    lineNumber: 499,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -749,13 +901,13 @@ function MarketPage() {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                    lineNumber: 451,
+                                                    lineNumber: 502,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                            lineNumber: 446,
+                                            lineNumber: 497,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -766,7 +918,7 @@ function MarketPage() {
                                                     children: "Daily change"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                    lineNumber: 455,
+                                                    lineNumber: 506,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -774,7 +926,7 @@ function MarketPage() {
                                                     children: quote?.change != null ? `${quote.change >= 0 ? '+' : ''}${quote.change.toFixed(2)}` : '—'
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                    lineNumber: 456,
+                                                    lineNumber: 507,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -782,13 +934,13 @@ function MarketPage() {
                                                     children: quote?.changePercent != null ? `${quote.changePercent >= 0 ? '+' : ''}${quote.changePercent.toFixed(2)}%` : '—'
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                    lineNumber: 459,
+                                                    lineNumber: 510,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                            lineNumber: 454,
+                                            lineNumber: 505,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -799,7 +951,7 @@ function MarketPage() {
                                                     children: "Open"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                    lineNumber: 465,
+                                                    lineNumber: 516,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -807,7 +959,7 @@ function MarketPage() {
                                                     children: latestCandle ? latestCandle.open.toFixed(2) : '—'
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                    lineNumber: 466,
+                                                    lineNumber: 517,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -815,13 +967,13 @@ function MarketPage() {
                                                     children: quote?.name ?? symbol
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                    lineNumber: 467,
+                                                    lineNumber: 518,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                            lineNumber: 464,
+                                            lineNumber: 515,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -832,7 +984,7 @@ function MarketPage() {
                                                     children: "Updated"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                    lineNumber: 471,
+                                                    lineNumber: 522,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -840,7 +992,7 @@ function MarketPage() {
                                                     children: dateLabel
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                    lineNumber: 472,
+                                                    lineNumber: 523,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -851,19 +1003,19 @@ function MarketPage() {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                    lineNumber: 473,
+                                                    lineNumber: 524,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                            lineNumber: 470,
+                                            lineNumber: 521,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                    lineNumber: 445,
+                                    lineNumber: 496,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
@@ -879,7 +1031,7 @@ function MarketPage() {
                                                             children: "Candlestick"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                            lineNumber: 480,
+                                                            lineNumber: 531,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
@@ -891,13 +1043,13 @@ function MarketPage() {
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                            lineNumber: 481,
+                                                            lineNumber: 532,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                    lineNumber: 479,
+                                                    lineNumber: 530,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -908,20 +1060,20 @@ function MarketPage() {
                                                             children: "Zoom"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                            lineNumber: 484,
+                                                            lineNumber: 535,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                                             type: "button",
-                                                            onClick: ()=>setVisibleCandles((current)=>Math.max(10, current - 10)),
-                                                            disabled: visibleCandles === 10,
-                                                            title: "Show fewer candles",
-                                                            "aria-label": "Show fewer candles",
+                                                            onClick: ()=>setWindowStart((current)=>Math.max(0, current - 1)),
+                                                            disabled: windowStart === 0,
+                                                            title: "Move one candle left",
+                                                            "aria-label": "Move one candle left",
                                                             className: "flex h-8 w-8 items-center justify-center rounded-lg border border-slate-700 bg-slate-950/70 text-lg text-slate-200 transition hover:border-cyan-400 hover:text-cyan-300 disabled:cursor-not-allowed disabled:opacity-40",
-                                                            children: "−"
+                                                            children: "←"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                            lineNumber: 485,
+                                                            lineNumber: 536,
                                                             columnNumber: 21
                                                         }, this),
                                                         [
@@ -937,51 +1089,55 @@ function MarketPage() {
                                                                 children: count
                                                             }, count, false, {
                                                                 fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                                lineNumber: 496,
+                                                                lineNumber: 547,
                                                                 columnNumber: 23
                                                             }, this)),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                                             type: "button",
-                                                            onClick: ()=>setVisibleCandles((current)=>Math.min(50, current + 10)),
-                                                            disabled: visibleCandles === 50,
-                                                            title: "Show more candles",
-                                                            "aria-label": "Show more candles",
+                                                            onClick: ()=>setWindowStart((current)=>Math.min(Math.max(candles.length - visibleCandles, 0), current + 1)),
+                                                            disabled: windowStart >= Math.max(candles.length - visibleCandles, 0),
+                                                            title: "Move one candle right",
+                                                            "aria-label": "Move one candle right",
                                                             className: "flex h-8 w-8 items-center justify-center rounded-lg border border-slate-700 bg-slate-950/70 text-lg text-slate-200 transition hover:border-cyan-400 hover:text-cyan-300 disabled:cursor-not-allowed disabled:opacity-40",
-                                                            children: "+"
+                                                            children: "→"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                            lineNumber: 506,
+                                                            lineNumber: 557,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                             className: "ml-1 rounded-full border border-slate-700 bg-slate-950/70 px-2.5 py-1 text-xs text-slate-300",
                                                             children: [
-                                                                visibleCandles,
-                                                                " candles"
+                                                                windowStart + 1,
+                                                                "-",
+                                                                Math.min(windowStart + visibleCandles, candles.length),
+                                                                " / ",
+                                                                candles.length
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                            lineNumber: 516,
+                                                            lineNumber: 567,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                    lineNumber: 483,
+                                                    lineNumber: 534,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                            lineNumber: 478,
+                                            lineNumber: 529,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(CandlestickChart, {
                                             candles: candles,
-                                            visibleCandles: visibleCandles
+                                            visibleCandles: visibleCandles,
+                                            windowStart: windowStart
                                         }, void 0, false, {
                                             fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                            lineNumber: 519,
+                                            lineNumber: 570,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -992,7 +1148,7 @@ function MarketPage() {
                                                     children: "Volume"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                    lineNumber: 521,
+                                                    lineNumber: 572,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1000,27 +1156,28 @@ function MarketPage() {
                                                     children: "Same zoom range"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                    lineNumber: 522,
+                                                    lineNumber: 573,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                            lineNumber: 520,
+                                            lineNumber: 571,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(VolumeChart, {
                                             candles: candles,
-                                            visibleCandles: visibleCandles
+                                            visibleCandles: visibleCandles,
+                                            windowStart: windowStart
                                         }, void 0, false, {
                                             fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                            lineNumber: 524,
+                                            lineNumber: 575,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                    lineNumber: 477,
+                                    lineNumber: 528,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
@@ -1036,148 +1193,173 @@ function MarketPage() {
                                                             children: "Technical indicator"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                            lineNumber: 530,
+                                                            lineNumber: 581,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
                                                             className: "mt-1 text-xl font-semibold text-white",
-                                                            children: "Close price / SMA 14 / EMA 14"
+                                                            children: "Selected indicators"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                            lineNumber: 531,
+                                                            lineNumber: 582,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                    lineNumber: 529,
+                                                    lineNumber: 580,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                    className: "flex flex-wrap gap-x-4 gap-y-2 text-xs text-slate-400",
+                                                    className: "flex flex-wrap gap-2",
                                                     children: [
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                        'sma',
+                                                        'ema',
+                                                        'rsi'
+                                                    ].map((indicator)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                            className: "flex cursor-pointer items-center gap-2 rounded-lg border border-slate-700 bg-slate-950/70 px-3 py-2 text-xs text-slate-300",
                                                             children: [
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("i", {
-                                                                    className: "mr-1 inline-block h-2 w-2 rounded-full bg-emerald-400"
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                                    type: "checkbox",
+                                                                    checked: selectedIndicators.includes(indicator),
+                                                                    onChange: ()=>setSelectedIndicators((current)=>current.includes(indicator) ? current.filter((item)=>item !== indicator) : [
+                                                                                ...current,
+                                                                                indicator
+                                                                            ]),
+                                                                    className: "accent-cyan-400"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                                    lineNumber: 534,
-                                                                    columnNumber: 27
+                                                                    lineNumber: 587,
+                                                                    columnNumber: 25
                                                                 }, this),
-                                                                "Bullish candle"
+                                                                indicator.toUpperCase(),
+                                                                " 14"
                                                             ]
-                                                        }, void 0, true, {
+                                                        }, indicator, true, {
                                                             fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                            lineNumber: 534,
-                                                            columnNumber: 21
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                            children: [
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("i", {
-                                                                    className: "mr-1 inline-block h-2 w-2 rounded-full bg-rose-400"
-                                                                }, void 0, false, {
-                                                                    fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                                    lineNumber: 535,
-                                                                    columnNumber: 27
-                                                                }, this),
-                                                                "Bearish candle"
-                                                            ]
-                                                        }, void 0, true, {
-                                                            fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                            lineNumber: 535,
-                                                            columnNumber: 21
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                            children: [
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("i", {
-                                                                    className: "mr-1 inline-block h-2 w-2 rounded-full bg-slate-400"
-                                                                }, void 0, false, {
-                                                                    fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                                    lineNumber: 536,
-                                                                    columnNumber: 27
-                                                                }, this),
-                                                                "Close"
-                                                            ]
-                                                        }, void 0, true, {
-                                                            fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                            lineNumber: 536,
-                                                            columnNumber: 21
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                            children: [
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("i", {
-                                                                    className: "mr-1 inline-block h-2 w-2 rounded-full bg-cyan-400"
-                                                                }, void 0, false, {
-                                                                    fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                                    lineNumber: 537,
-                                                                    columnNumber: 27
-                                                                }, this),
-                                                                "SMA 14"
-                                                            ]
-                                                        }, void 0, true, {
-                                                            fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                            lineNumber: 537,
-                                                            columnNumber: 21
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                            children: [
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("i", {
-                                                                    className: "mr-1 inline-block h-2 w-2 rounded-full bg-amber-400"
-                                                                }, void 0, false, {
-                                                                    fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                                    lineNumber: 538,
-                                                                    columnNumber: 27
-                                                                }, this),
-                                                                "EMA 14"
-                                                            ]
-                                                        }, void 0, true, {
-                                                            fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                            lineNumber: 538,
-                                                            columnNumber: 21
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                            children: [
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("i", {
-                                                                    className: "mr-1 inline-block h-2 w-2 rounded-full bg-slate-500"
-                                                                }, void 0, false, {
-                                                                    fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                                    lineNumber: 539,
-                                                                    columnNumber: 27
-                                                                }, this),
-                                                                "Volume"
-                                                            ]
-                                                        }, void 0, true, {
-                                                            fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                            lineNumber: 539,
-                                                            columnNumber: 21
-                                                        }, this)
-                                                    ]
-                                                }, void 0, true, {
+                                                            lineNumber: 586,
+                                                            columnNumber: 23
+                                                        }, this))
+                                                }, void 0, false, {
                                                     fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                    lineNumber: 533,
+                                                    lineNumber: 584,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                            lineNumber: 528,
+                                            lineNumber: 579,
                                             columnNumber: 17
                                         }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(SmaChart, {
-                                            values: smaValues,
-                                            emaValues: emaValues,
-                                            candles: candles,
-                                            visibleCandles: visibleCandles
+                                        selectedIndicators.some((indicator)=>indicator === 'sma' || indicator === 'ema') ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "mb-2 flex flex-wrap gap-4 text-xs text-slate-400",
+                                                    children: [
+                                                        selectedIndicators.includes('sma') ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                            className: "text-cyan-300",
+                                                            children: [
+                                                                "SMA 14: ",
+                                                                smaValues.filter((value)=>value.sma !== null).at(-1)?.sma?.toFixed(2) ?? '—'
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "[project]/app/(dashboard)/market/page.tsx",
+                                                            lineNumber: 601,
+                                                            columnNumber: 61
+                                                        }, this) : null,
+                                                        selectedIndicators.includes('ema') ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                            className: "text-amber-300",
+                                                            children: [
+                                                                "EMA 14: ",
+                                                                emaValues.filter((value)=>value.ema !== null).at(-1)?.ema?.toFixed(2) ?? '—'
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "[project]/app/(dashboard)/market/page.tsx",
+                                                            lineNumber: 602,
+                                                            columnNumber: 61
+                                                        }, this) : null
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/app/(dashboard)/market/page.tsx",
+                                                    lineNumber: 600,
+                                                    columnNumber: 21
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(SmaChart, {
+                                                    values: smaValues,
+                                                    emaValues: emaValues,
+                                                    candles: candles,
+                                                    visibleCandles: visibleCandles,
+                                                    windowStart: windowStart,
+                                                    showSma: selectedIndicators.includes('sma'),
+                                                    showEma: selectedIndicators.includes('ema')
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/(dashboard)/market/page.tsx",
+                                                    lineNumber: 604,
+                                                    columnNumber: 21
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/app/(dashboard)/market/page.tsx",
+                                            lineNumber: 599,
+                                            columnNumber: 19
+                                        }, this) : null,
+                                        selectedIndicators.includes('rsi') ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "mt-4",
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "mb-2 flex items-center justify-between text-xs text-slate-400",
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                            children: "RSI 14"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/(dashboard)/market/page.tsx",
+                                                            lineNumber: 610,
+                                                            columnNumber: 23
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                            children: [
+                                                                "Current: ",
+                                                                rsiValues.filter((value)=>value.rsi !== null).at(-1)?.rsi?.toFixed(2) ?? '—',
+                                                                " | 30 oversold / 70 overbought"
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "[project]/app/(dashboard)/market/page.tsx",
+                                                            lineNumber: 611,
+                                                            columnNumber: 23
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/app/(dashboard)/market/page.tsx",
+                                                    lineNumber: 609,
+                                                    columnNumber: 21
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(RsiChart, {
+                                                    values: rsiValues,
+                                                    visibleCandles: visibleCandles,
+                                                    windowStart: windowStart
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/(dashboard)/market/page.tsx",
+                                                    lineNumber: 613,
+                                                    columnNumber: 21
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/app/(dashboard)/market/page.tsx",
+                                            lineNumber: 608,
+                                            columnNumber: 19
+                                        }, this) : null,
+                                        !selectedIndicators.length ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                            className: "rounded-2xl border border-slate-800 bg-slate-950/80 p-8 text-center text-sm text-slate-400",
+                                            children: "Select an indicator to display it."
                                         }, void 0, false, {
                                             fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                            lineNumber: 542,
-                                            columnNumber: 17
-                                        }, this)
+                                            lineNumber: 616,
+                                            columnNumber: 47
+                                        }, this) : null
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                    lineNumber: 527,
+                                    lineNumber: 578,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
@@ -1191,7 +1373,7 @@ function MarketPage() {
                                                     children: "Recent candles"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                    lineNumber: 552,
+                                                    lineNumber: 621,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1199,13 +1381,13 @@ function MarketPage() {
                                                     children: "Last 10 entries"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                    lineNumber: 553,
+                                                    lineNumber: 622,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                            lineNumber: 551,
+                                            lineNumber: 620,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1222,7 +1404,7 @@ function MarketPage() {
                                                                     children: "Date"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                                    lineNumber: 560,
+                                                                    lineNumber: 629,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -1230,7 +1412,7 @@ function MarketPage() {
                                                                     children: "Hour"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                                    lineNumber: 561,
+                                                                    lineNumber: 630,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -1238,7 +1420,7 @@ function MarketPage() {
                                                                     children: "Open"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                                    lineNumber: 562,
+                                                                    lineNumber: 631,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -1246,7 +1428,7 @@ function MarketPage() {
                                                                     children: "High"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                                    lineNumber: 563,
+                                                                    lineNumber: 632,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -1254,7 +1436,7 @@ function MarketPage() {
                                                                     children: "Low"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                                    lineNumber: 564,
+                                                                    lineNumber: 633,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -1262,7 +1444,7 @@ function MarketPage() {
                                                                     children: "Close"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                                    lineNumber: 565,
+                                                                    lineNumber: 634,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -1270,18 +1452,18 @@ function MarketPage() {
                                                                     children: "Volume"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                                    lineNumber: 566,
+                                                                    lineNumber: 635,
                                                                     columnNumber: 25
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                            lineNumber: 559,
+                                                            lineNumber: 628,
                                                             columnNumber: 23
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                        lineNumber: 558,
+                                                        lineNumber: 627,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("tbody", {
@@ -1295,7 +1477,7 @@ function MarketPage() {
                                                                         children: candleDate.toLocaleDateString()
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                                        lineNumber: 575,
+                                                                        lineNumber: 644,
                                                                         columnNumber: 29
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -1306,7 +1488,7 @@ function MarketPage() {
                                                                         })
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                                        lineNumber: 576,
+                                                                        lineNumber: 645,
                                                                         columnNumber: 29
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -1314,7 +1496,7 @@ function MarketPage() {
                                                                         children: candle.open.toFixed(2)
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                                        lineNumber: 577,
+                                                                        lineNumber: 646,
                                                                         columnNumber: 29
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -1322,7 +1504,7 @@ function MarketPage() {
                                                                         children: candle.high.toFixed(2)
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                                        lineNumber: 578,
+                                                                        lineNumber: 647,
                                                                         columnNumber: 29
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -1330,7 +1512,7 @@ function MarketPage() {
                                                                         children: candle.low.toFixed(2)
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                                        lineNumber: 579,
+                                                                        lineNumber: 648,
                                                                         columnNumber: 29
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -1338,7 +1520,7 @@ function MarketPage() {
                                                                         children: candle.close.toFixed(2)
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                                        lineNumber: 580,
+                                                                        lineNumber: 649,
                                                                         columnNumber: 29
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -1346,59 +1528,59 @@ function MarketPage() {
                                                                         children: candle.volume != null ? candle.volume.toLocaleString() : '—'
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                                        lineNumber: 581,
+                                                                        lineNumber: 650,
                                                                         columnNumber: 29
                                                                     }, this)
                                                                 ]
                                                             }, `${candle.datetime}-${candle.close}`, true, {
                                                                 fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                                lineNumber: 574,
+                                                                lineNumber: 643,
                                                                 columnNumber: 27
                                                             }, this);
                                                         })
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                        lineNumber: 569,
+                                                        lineNumber: 638,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                                lineNumber: 557,
+                                                lineNumber: 626,
                                                 columnNumber: 19
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                            lineNumber: 556,
+                                            lineNumber: 625,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/(dashboard)/market/page.tsx",
-                                    lineNumber: 550,
+                                    lineNumber: 619,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/(dashboard)/market/page.tsx",
-                            lineNumber: 444,
+                            lineNumber: 495,
                             columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/(dashboard)/market/page.tsx",
-                    lineNumber: 370,
+                    lineNumber: 421,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/app/(dashboard)/market/page.tsx",
-            lineNumber: 336,
+            lineNumber: 387,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/app/(dashboard)/market/page.tsx",
-        lineNumber: 335,
+        lineNumber: 386,
         columnNumber: 5
     }, this);
 }

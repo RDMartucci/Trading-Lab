@@ -47,13 +47,19 @@ type EmaResponse = {
     values: Array<{ datetime: string; close: number; ema: number | null }>;
   };
 };
+type RsiResponse = {
+  data: {
+    period: number;
+    values: Array<{ datetime: string; close: number; rsi: number | null }>;
+  };
+};
 
 const DEFAULT_SYMBOL = 'AAPL';
 const DEFAULT_INTERVAL = '1day';
 const API_BASE = 'http://localhost:4000';
 
-function CandlestickChart({ candles, visibleCandles }: { candles: Candle[]; visibleCandles: number }) {
-  const chartCandles = candles.slice(-visibleCandles);
+function CandlestickChart({ candles, visibleCandles, windowStart }: { candles: Candle[]; visibleCandles: number; windowStart: number }) {
+  const chartCandles = candles.slice(windowStart, windowStart + visibleCandles);
 
   if (!chartCandles.length) {
     return (
@@ -75,6 +81,8 @@ function CandlestickChart({ candles, visibleCandles }: { candles: Candle[]; visi
 
   return (
     <svg viewBox={`0 0 ${width} ${height}`} className="h-64 w-full rounded-2xl bg-slate-950/80">
+      <text x={padding} y={14} fill="#cbd5e1" fontSize="11">High {max.toFixed(2)}</text>
+      <text x={padding} y={height - 6} fill="#cbd5e1" fontSize="11">Low {min.toFixed(2)}</text>
       {[0, 0.25, 0.5, 0.75, 1].map((ratio) => {
         const y = padding + (height - padding * 2) * (1 - ratio);
         return (
@@ -119,8 +127,8 @@ function CandlestickChart({ candles, visibleCandles }: { candles: Candle[]; visi
   );
 }
 
-function VolumeChart({ candles, visibleCandles }: { candles: Candle[]; visibleCandles: number }) {
-  const chartCandles = candles.slice(-visibleCandles);
+function VolumeChart({ candles, visibleCandles, windowStart }: { candles: Candle[]; visibleCandles: number; windowStart: number }) {
+  const chartCandles = candles.slice(windowStart, windowStart + visibleCandles);
   const volumes = chartCandles.map((candle) => candle.volume ?? 0);
   const maxVolume = Math.max(...volumes, 0);
 
@@ -139,6 +147,7 @@ function VolumeChart({ candles, visibleCandles }: { candles: Candle[]; visibleCa
 
   return (
     <svg viewBox={`0 0 ${width} ${height}`} className="h-32 w-full rounded-2xl bg-slate-950/80">
+      <text x={padding} y={12} fill="#cbd5e1" fontSize="11">Max {maxVolume.toLocaleString()}</text>
       {chartCandles.map((candle, index) => {
         const volume = candle.volume ?? 0;
         const barHeight = (volume / maxVolume) * (height - padding * 2);
@@ -161,9 +170,13 @@ function VolumeChart({ candles, visibleCandles }: { candles: Candle[]; visibleCa
   );
 }
 
-function SmaChart({ values, emaValues, candles, visibleCandles }: { values: SmaResponse['data']['values']; emaValues: EmaResponse['data']['values']; candles: Candle[]; visibleCandles: number }) {
-  const chartValues = values.slice(-visibleCandles);
-  const validSmaValues = chartValues.filter((value) => value.sma !== null);
+function SmaChart({ values, emaValues, candles, visibleCandles, windowStart, showSma, showEma }: { values: SmaResponse['data']['values']; emaValues: EmaResponse['data']['values']; candles: Candle[]; visibleCandles: number; windowStart: number; showSma: boolean; showEma: boolean }) {
+  const visibleData = candles.slice(windowStart, windowStart + visibleCandles);
+  const valuesByDate = new Map(values.map((value) => [value.datetime, value]));
+  const chartValues = visibleData
+    .map((candle) => valuesByDate.get(candle.datetime))
+    .filter((value): value is SmaResponse['data']['values'][number] => value !== undefined);
+  const validSmaValues = chartValues.filter((value) => (showSma && value.sma !== null) || (showEma && emaValues.some((ema) => ema.datetime === value.datetime && ema.ema !== null)));
 
   if (!chartValues.length || !validSmaValues.length) {
     return (
@@ -176,30 +189,35 @@ function SmaChart({ values, emaValues, candles, visibleCandles }: { values: SmaR
   const width = 780;
   const height = 160;
   const padding = 20;
-  const prices = chartValues.flatMap((value) => [value.close, value.sma ?? value.close]);
+  const emaByDate = new Map(emaValues.map((value) => [value.datetime, value.ema]));
+  const prices = chartValues.flatMap((value) => [
+    value.close,
+    ...(showSma && value.sma !== null ? [value.sma] : []),
+    ...(showEma && emaByDate.get(value.datetime) !== null && emaByDate.get(value.datetime) !== undefined ? [emaByDate.get(value.datetime) as number] : [])
+  ]);
   const min = Math.min(...prices);
   const max = Math.max(...prices);
   const range = max - min || 1;
   const xStep = (width - padding * 2) / Math.max(chartValues.length - 1, 1);
   const toPoint = (value: number, index: number) => `${padding + index * xStep},${padding + ((max - value) / range) * (height - padding * 2)}`;
   const closePoints = chartValues.map((value, index) => toPoint(value.close, index)).join(' ');
-  const smaPoints = chartValues
+  const smaPoints = showSma ? chartValues
     .map((value, index) => value.sma === null ? null : toPoint(value.sma, index))
     .filter((point): point is string => point !== null)
-    .join(' ');
-  const emaByDate = new Map(emaValues.map((value) => [value.datetime, value.ema]));
-  const emaPoints = chartValues
+    .join(' ') : '';
+  const emaPoints = showEma ? chartValues
     .map((value, index) => {
       const ema = emaByDate.get(value.datetime);
       return ema === null || ema === undefined ? null : toPoint(ema, index);
     })
     .filter((point): point is string => point !== null)
-    .join(' ');
+    .join(' ') : '';
   const candleByDate = new Map(candles.map((candle) => [candle.datetime, candle]));
   const maxVolume = Math.max(...chartValues.map((value) => candleByDate.get(value.datetime)?.volume ?? 0), 1);
-
   return (
     <svg viewBox={`0 0 ${width} ${height}`} className="h-44 w-full rounded-2xl bg-slate-950/80">
+      <text x={padding} y={14} fill="#cbd5e1" fontSize="11">High {max.toFixed(2)}</text>
+      <text x={padding} y={height - 4} fill="#cbd5e1" fontSize="11">Low {min.toFixed(2)}</text>
       {chartValues.map((value, index) => {
         const candle = candleByDate.get(value.datetime);
         const volume = candle?.volume ?? 0;
@@ -220,8 +238,8 @@ function SmaChart({ values, emaValues, candles, visibleCandles }: { values: SmaR
         );
       })}
       <polyline points={closePoints} fill="none" stroke="#94a3b8" strokeWidth="2" />
-      <polyline points={smaPoints} fill="none" stroke="#22d3ee" strokeWidth="2.5" />
-      <polyline points={emaPoints} fill="none" stroke="#f59e0b" strokeWidth="2.5" />
+      {showSma ? <polyline points={smaPoints} fill="none" stroke="#22d3ee" strokeWidth="2.5" /> : null}
+      {showEma ? <polyline points={emaPoints} fill="none" stroke="#f59e0b" strokeWidth="2.5" /> : null}
       {chartValues.map((value, index) => {
         const candle = candleByDate.get(value.datetime);
         return (
@@ -238,6 +256,32 @@ function SmaChart({ values, emaValues, candles, visibleCandles }: { values: SmaR
   );
 }
 
+function RsiChart({ values, visibleCandles, windowStart }: { values: RsiResponse['data']['values']; visibleCandles: number; windowStart: number }) {
+  const chartValues = values.slice(windowStart, windowStart + visibleCandles);
+  const validValues = chartValues.filter((value) => value.rsi !== null);
+
+  if (!validValues.length) {
+    return <div className="flex h-40 items-center justify-center rounded-2xl border border-slate-800 bg-slate-950/80 text-sm text-slate-400">Not enough data for RSI 14</div>;
+  }
+
+  const width = 780;
+  const height = 160;
+  const padding = 20;
+  const xStep = (width - padding * 2) / Math.max(chartValues.length - 1, 1);
+  const point = (value: number, index: number) => `${padding + index * xStep},${padding + ((100 - value) / 100) * (height - padding * 2)}`;
+  const rsiPoints = chartValues.map((value, index) => value.rsi === null ? null : point(value.rsi, index)).filter((value): value is string => value !== null).join(' ');
+
+  return (
+    <svg viewBox={`0 0 ${width} ${height}`} className="h-44 w-full rounded-2xl bg-slate-950/80">
+      {[30, 50, 70].map((level) => {
+        const y = padding + ((100 - level) / 100) * (height - padding * 2);
+        return <line key={level} x1={padding} x2={width - padding} y1={y} y2={y} stroke={level === 50 ? 'rgba(148, 163, 184, 0.2)' : 'rgba(245, 158, 11, 0.35)'} strokeDasharray="4 4" />;
+      })}
+      <polyline points={rsiPoints} fill="none" stroke="#a78bfa" strokeWidth="2.5" />
+    </svg>
+  );
+}
+
 export default function MarketPage() {
   const [symbol, setSymbol] = useState(DEFAULT_SYMBOL);
   const [interval, setInterval] = useState(DEFAULT_INTERVAL);
@@ -245,11 +289,14 @@ export default function MarketPage() {
   const [candles, setCandles] = useState<Candle[]>([]);
   const [smaValues, setSmaValues] = useState<SmaResponse['data']['values']>([]);
   const [emaValues, setEmaValues] = useState<EmaResponse['data']['values']>([]);
+  const [rsiValues, setRsiValues] = useState<RsiResponse['data']['values']>([]);
+  const [selectedIndicators, setSelectedIndicators] = useState<string[]>(['sma', 'ema', 'rsi']);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [syncMessage, setSyncMessage] = useState<string | null>(null);
-  const [visibleCandles, setVisibleCandles] = useState(30);
+  const [visibleCandles, setVisibleCandles] = useState(10);
+  const [windowStart, setWindowStart] = useState(0);
 
   const latestCandle = useMemo(() => candles[candles.length - 1], [candles]);
 
@@ -264,10 +311,11 @@ export default function MarketPage() {
       ]);
       const smaRes = await fetch(`${API_BASE}/api/indicators/sma/${selectedSymbol}?interval=${interval}&period=14`);
       const emaRes = await fetch(`${API_BASE}/api/indicators/ema/${selectedSymbol}?interval=${interval}&period=14`);
+      const rsiRes = await fetch(`${API_BASE}/api/indicators/rsi/${selectedSymbol}?interval=${interval}&period=14`);
 
-      if (!quoteRes.ok || !candlesRes.ok || !smaRes.ok || !emaRes.ok) {
+      if (!quoteRes.ok || !candlesRes.ok || !smaRes.ok || !emaRes.ok || !rsiRes.ok) {
         const quoteText = quoteRes.ok
-          ? candlesRes.ok ? smaRes.ok ? await emaRes.text() : await smaRes.text() : await candlesRes.text()
+          ? candlesRes.ok ? smaRes.ok ? emaRes.ok ? await rsiRes.text() : await emaRes.text() : await smaRes.text() : await candlesRes.text()
           : await quoteRes.text();
         throw new Error(quoteText || 'Unable to load market data');
       }
@@ -276,11 +324,14 @@ export default function MarketPage() {
       const candlesPayload = (await candlesRes.json()) as CandlesResponse;
       const smaPayload = (await smaRes.json()) as SmaResponse;
       const emaPayload = (await emaRes.json()) as EmaResponse;
+      const rsiPayload = (await rsiRes.json()) as RsiResponse;
 
       setQuote(quotePayload.data);
       setCandles(candlesPayload.data?.data ?? []);
       setSmaValues(smaPayload.data?.values ?? []);
       setEmaValues(emaPayload.data?.values ?? []);
+      setRsiValues(rsiPayload.data?.values ?? []);
+      setWindowStart(0);
     } catch (loadError) {
       const message = loadError instanceof Error ? loadError.message : 'Unknown market error';
       setError(message);
@@ -484,13 +535,13 @@ export default function MarketPage() {
                     <span className="mr-1 text-xs text-slate-500">Zoom</span>
                     <button
                       type="button"
-                      onClick={() => setVisibleCandles((current) => Math.max(10, current - 10))}
-                      disabled={visibleCandles === 10}
-                      title="Show fewer candles"
-                      aria-label="Show fewer candles"
+                      onClick={() => setWindowStart((current) => Math.max(0, current - 1))}
+                      disabled={windowStart === 0}
+                      title="Move one candle left"
+                      aria-label="Move one candle left"
                       className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-700 bg-slate-950/70 text-lg text-slate-200 transition hover:border-cyan-400 hover:text-cyan-300 disabled:cursor-not-allowed disabled:opacity-40"
                     >
-                      −
+                      ←
                     </button>
                     {[10, 20, 30, 50].map((count) => (
                       <button
@@ -505,46 +556,64 @@ export default function MarketPage() {
                     ))}
                     <button
                       type="button"
-                      onClick={() => setVisibleCandles((current) => Math.min(50, current + 10))}
-                      disabled={visibleCandles === 50}
-                      title="Show more candles"
-                      aria-label="Show more candles"
+                      onClick={() => setWindowStart((current) => Math.min(Math.max(candles.length - visibleCandles, 0), current + 1))}
+                      disabled={windowStart >= Math.max(candles.length - visibleCandles, 0)}
+                      title="Move one candle right"
+                      aria-label="Move one candle right"
                       className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-700 bg-slate-950/70 text-lg text-slate-200 transition hover:border-cyan-400 hover:text-cyan-300 disabled:cursor-not-allowed disabled:opacity-40"
                     >
-                      +
+                      →
                     </button>
-                    <span className="ml-1 rounded-full border border-slate-700 bg-slate-950/70 px-2.5 py-1 text-xs text-slate-300">{visibleCandles} candles</span>
+                    <span className="ml-1 rounded-full border border-slate-700 bg-slate-950/70 px-2.5 py-1 text-xs text-slate-300">{windowStart + 1}-{Math.min(windowStart + visibleCandles, candles.length)} / {candles.length}</span>
                   </div>
                 </div>
-                <CandlestickChart candles={candles} visibleCandles={visibleCandles} />
+                <CandlestickChart candles={candles} visibleCandles={visibleCandles} windowStart={windowStart} />
                 <div className="mt-3 flex items-center justify-between">
                   <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Volume</p>
                   <span className="text-xs text-slate-500">Same zoom range</span>
                 </div>
-                <VolumeChart candles={candles} visibleCandles={visibleCandles} />
+                <VolumeChart candles={candles} visibleCandles={visibleCandles} windowStart={windowStart} />
               </section>
 
               <section className="rounded-3xl border border-slate-800/80 bg-slate-900/80 p-5 shadow-[0_12px_40px_rgba(15,23,42,0.35)]">
                 <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                   <div>
                     <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Technical indicator</p>
-                    <h3 className="mt-1 text-xl font-semibold text-white">Close price / SMA 14 / EMA 14</h3>
+                    <h3 className="mt-1 text-xl font-semibold text-white">Selected indicators</h3>
                   </div>
-                  <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs text-slate-400">
-                    <span><i className="mr-1 inline-block h-2 w-2 rounded-full bg-emerald-400" />Bullish candle</span>
-                    <span><i className="mr-1 inline-block h-2 w-2 rounded-full bg-rose-400" />Bearish candle</span>
-                    <span><i className="mr-1 inline-block h-2 w-2 rounded-full bg-slate-400" />Close</span>
-                    <span><i className="mr-1 inline-block h-2 w-2 rounded-full bg-cyan-400" />SMA 14</span>
-                    <span><i className="mr-1 inline-block h-2 w-2 rounded-full bg-amber-400" />EMA 14</span>
-                    <span><i className="mr-1 inline-block h-2 w-2 rounded-full bg-slate-500" />Volume</span>
+                  <div className="flex flex-wrap gap-2">
+                    {['sma', 'ema', 'rsi'].map((indicator) => (
+                      <label key={indicator} className="flex cursor-pointer items-center gap-2 rounded-lg border border-slate-700 bg-slate-950/70 px-3 py-2 text-xs text-slate-300">
+                        <input
+                          type="checkbox"
+                          checked={selectedIndicators.includes(indicator)}
+                          onChange={() => setSelectedIndicators((current) => current.includes(indicator) ? current.filter((item) => item !== indicator) : [...current, indicator])}
+                          className="accent-cyan-400"
+                        />
+                        {indicator.toUpperCase()} 14
+                      </label>
+                    ))}
                   </div>
                 </div>
-                <SmaChart
-                  values={smaValues}
-                  emaValues={emaValues}
-                  candles={candles}
-                  visibleCandles={visibleCandles}
-                />
+                {selectedIndicators.some((indicator) => indicator === 'sma' || indicator === 'ema') ? (
+                  <div>
+                    <div className="mb-2 flex flex-wrap gap-4 text-xs text-slate-400">
+                      {selectedIndicators.includes('sma') ? <span className="text-cyan-300">SMA 14: {smaValues.filter((value) => value.sma !== null).at(-1)?.sma?.toFixed(2) ?? '—'}</span> : null}
+                      {selectedIndicators.includes('ema') ? <span className="text-amber-300">EMA 14: {emaValues.filter((value) => value.ema !== null).at(-1)?.ema?.toFixed(2) ?? '—'}</span> : null}
+                    </div>
+                    <SmaChart values={smaValues} emaValues={emaValues} candles={candles} visibleCandles={visibleCandles} windowStart={windowStart} showSma={selectedIndicators.includes('sma')} showEma={selectedIndicators.includes('ema')} />
+                  </div>
+                ) : null}
+                {selectedIndicators.includes('rsi') ? (
+                  <div className="mt-4">
+                    <div className="mb-2 flex items-center justify-between text-xs text-slate-400">
+                      <span>RSI 14</span>
+                      <span>Current: {rsiValues.filter((value) => value.rsi !== null).at(-1)?.rsi?.toFixed(2) ?? '—'} | 30 oversold / 70 overbought</span>
+                    </div>
+                    <RsiChart values={rsiValues} visibleCandles={visibleCandles} windowStart={windowStart} />
+                  </div>
+                ) : null}
+                {!selectedIndicators.length ? <p className="rounded-2xl border border-slate-800 bg-slate-950/80 p-8 text-center text-sm text-slate-400">Select an indicator to display it.</p> : null}
               </section>
 
               <section className="rounded-3xl border border-slate-800/80 bg-slate-900/80 p-5 shadow-[0_12px_40px_rgba(15,23,42,0.35)]">

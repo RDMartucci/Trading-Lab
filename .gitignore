@@ -31,3 +31,4 @@ docker-data/
 *.txt
 *terabox.uploading.cfg
 
+frontend/.next-trading-lab/

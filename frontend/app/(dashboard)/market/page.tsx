@@ -24,8 +24,18 @@ type Candle = {
 };
 
 type QuoteResponse = { data: Quote };
-type CandlesResponse = { data: { symbol: string; interval: string; data: Candle[] } };
-type SyncResponse = { data: { symbol: string; interval: string; candlesInserted: number; status: string; timestamp: string } };
+type CandlesResponse = { data: { 
+                          symbol: string; 
+                          interval: string; 
+                          data: Candle[] } 
+};
+type SyncResponse = { data: { 
+                        symbol: string; 
+                        interval: string; 
+                        candlesInserted: number; 
+                        status: string; 
+                        timestamp: string }
+};
 
 const DEFAULT_SYMBOL = 'AAPL';
 const DEFAULT_INTERVAL = '1day';
@@ -233,8 +243,15 @@ export default function MarketPage() {
                   <option value="1min">1min</option>
                   <option value="5min">5min</option>
                   <option value="15min">15min</option>
-                  <option value="1hour">1hour</option>
+                  <option value="30min">30min</option>
+                  <option value="45min">45min</option>
+                  <option value="1h">1h</option>
+                  <option value="2h">2h</option>
+                  <option value="4h">4h</option>
+                  <option value="8h">8h</option>
                   <option value="1day">1day</option>
+                  <option value="1week">1week</option>
+                  <option value="1month">1month</option>
                 </select>
 
                 <button

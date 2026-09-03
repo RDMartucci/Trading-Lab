@@ -47,6 +47,7 @@ export class TwelveDataTimeSeriesProvider {
     outputsize: number
   ): Promise<MarketTimeSeries> {
     const normalizedSymbol = symbol.trim().toUpperCase();
+    const normalizedInterval = normalizeInterval(interval);
 
     if (!normalizedSymbol) {
       throw new Error("SYMBOL_REQUIRED");
@@ -59,7 +60,7 @@ export class TwelveDataTimeSeriesProvider {
     const url = new URL(this.baseUrl);
 
     url.searchParams.set("symbol", normalizedSymbol);
-    url.searchParams.set("interval", interval);
+    url.searchParams.set("interval", normalizedInterval);
     url.searchParams.set("outputsize", String(outputsize));
     url.searchParams.set("apikey", this.apiKey);
 
@@ -151,6 +152,30 @@ export class TwelveDataTimeSeriesProvider {
   }
 }
 
+
+function normalizeInterval(interval: string): string {
+  const value = interval.trim().toLowerCase();
+
+  const aliases: Record<string, string> = {
+    "1hour": "1h",
+    "1hr": "1h",
+    "60min": "1h",
+    "1min": "1min",
+    "5min": "5min",
+    "15min": "15min",
+    "30min": "30min",
+    "45min": "45min",
+    "1h": "1h",
+    "2h": "2h",
+    "4h": "4h",
+    "8h": "8h",
+    "1day": "1day",
+    "1week": "1week",
+    "1month": "1month"
+  };
+
+  return aliases[value] ?? value;
+}
 
 function toNumber(value: string | undefined): number | null {
   if (value === undefined || value === "") {

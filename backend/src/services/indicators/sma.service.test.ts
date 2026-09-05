@@ -1,3 +1,5 @@
+// backend/src/services/indicators/sma.service.test.ts
+
 import test from "node:test";
 import assert from "node:assert/strict";
 

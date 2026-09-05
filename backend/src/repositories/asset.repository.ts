@@ -1,3 +1,4 @@
+// backend/src/repositories/asset.repository.ts
 import { pool } from "../database/postgres.js";
 import type { MarketAsset } from "../models/market-candle.js";
 

@@ -1,3 +1,5 @@
+// backend/src/models/market-candle.ts
+
 export type MarketAsset = {
   id?: number;
   symbol: string;

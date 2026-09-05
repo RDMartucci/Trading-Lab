@@ -1,3 +1,4 @@
+// backend/src/repositories/market-candle.repository.ts
 import { pool } from "../database/postgres.js";
 import type { MarketCandle, MarketTimeSeries } from "../market-data/twelve-data-time-series-provider.js";
 

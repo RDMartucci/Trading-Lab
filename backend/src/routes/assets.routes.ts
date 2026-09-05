@@ -1,3 +1,4 @@
+// backend/src/routes/assets.routes.ts
 import { Router } from "express";
 import { AssetsController } from "../controllers/assets.controller.js";
 

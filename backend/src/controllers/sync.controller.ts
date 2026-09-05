@@ -1,3 +1,5 @@
+// backend/src/controllers/sync.controller.ts
+
 import type { Request, Response } from "express";
 
 import { TwelveDataProviderError } from "../market-data/twelve-data-provider-error.js";

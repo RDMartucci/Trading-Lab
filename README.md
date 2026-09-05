@@ -1,18 +1,21 @@
 # Trading Lab
 
-Trading Lab es un proyecto de analítica y exploración de mercados financieros con una arquitectura monolítica modular orientada a servicios. La intención del proyecto es disponer de un backend para consultar datos de mercado, preparar indicadores y servicios de análisis, y un frontend para visualizar información y construir una experiencia de trading.
+Trading Lab es un proyecto full-stack para análisis de mercado, visualización financiera y preparación de indicadores técnicos. La base actual ya incluye integración con datos reales de Twelve Data, persistencia en PostgreSQL y un dashboard funcional para consultar cotizaciones, sincronizar series históricas y evaluar señales técnicas.
 
 ## Estado actual
 
-El proyecto ya tiene la base funcional de una aplicación full-stack con:
+El proyecto ya está en una etapa funcional de prototipo/alpha con las siguientes capacidades implementadas:
 
-- backend en Node.js + Express + TypeScript
-- frontend en Next.js + React + TypeScript
-- PostgreSQL como almacenamiento relacional
-- conexión con Twelve Data para cotizaciones e historiales de mercado
-- estructura preparada para crecer en módulos de señales, cartera, indicadores, noticias y backtesting
+- Backend en Node.js + Express + TypeScript
+- Frontend en Next.js + React + TypeScript
+- PostgreSQL como almacenamiento principal de precios y activos
+- Integración con Twelve Data para cotizaciones y series históricas
+- Persistencia automática de candles por símbolo e intervalo
+- Dashboard de mercado con gráficos y indicadores técnicos
+- Endpoints para activo, historial, sincronización y cálculo de indicadores
+- Estructura preparada para ampliar módulos de señales, cartera, noticias y backtesting
 
-> El proyecto está en una etapa de base técnica y desarrollo inicial: el backend ya expone endpoints de salud y de mercado, y el frontend aún conserva la plantilla inicial de Next.js que luego se sustituirá por la experiencia de Trading Lab.
+> La aplicación ya no es solo una base técnica: el backend y el frontend cuentan con flujo real de carga de mercado, análisis técnico y visualización de datos.
 
 ## Stack tecnológico
 
@@ -22,16 +25,65 @@ El proyecto ya tiene la base funcional de una aplicación full-stack con:
 - Infraestructura local: Docker Compose
 - APIs externas: Twelve Data
 
+## Funcionalidades nuevas y ya disponibles
+
+### 1) Consulta de mercado en tiempo real
+
+- Cotización actual por símbolo
+- Datos de mercado con nombre, exchange, moneda y variación diaria
+- Soporte para distintos símbolos y endpoints con respuesta JSON estructurada
+
+### 2) Historial de precios persistido en PostgreSQL
+
+- Recuperación de series históricas desde Twelve Data
+- Persistencia de candles con `market_assets` y `market_candles`
+- Evita duplicados usando constraints y upserts
+- Soporte para limitación de registros por intervalo
+
+### 3) Sincronización de datos con el backend
+
+- Endpoint dedicado para traer y guardar datos del proveedor a la base de datos
+- Permite sincronizar históricos por símbolo e intervalo
+- Devuelve el número de candles insertados / procesados
+
+### 4) Catálogo de activos y estadísticas
+
+- Listado de activos persistidos
+- Consulta por símbolo
+- Endpoint de estadísticas por activo con recuento de candles y rango temporal
+
+### 5) Indicadores técnicos calculados en backend
+
+Actualmente están expuestos estos indicadores:
+
+- SMA (Simple Moving Average)
+- EMA (Exponential Moving Average)
+- RSI (Relative Strength Index)
+
+Se calculan sobre series históricas persistidas o en fallback con datos en vivo.
+
+### 6) Dashboard de Trading Lab
+
+El frontend incluye una vista funcional con:
+
+- selector de símbolo e intervalo
+- tasa de cambio y última cotización
+- candlesticks y volumen
+- zoom de ventana de candles
+- indicadores SMA, EMA y RSI sobre el mismo conjunto de datos
+- sincronización directa desde la interfaz
+- tabla de velas recientes
+
 ## Requisitos previos
 
-- Node.js 20+ o compatible con las versiones declaradas en los package.json
+- Node.js 20+
 - npm
 - Docker Desktop con Docker Compose
-- Una clave API válida de Twelve Data para consumir datos reales de mercado
+- Clave API válida de Twelve Data
 
 ## Configuración de entorno
 
-En la raíz del proyecto crea un archivo `.env` basado en el ejemplo disponible:
+En la raíz del proyecto crea un archivo `.env` con esta estructura:
 
 ```env
 POSTGRES_DB=trading_lab
@@ -43,7 +95,7 @@ POSTGRES_PORT=5432
 API_KEY_TWELVEDATA=tu_clave_twelvedata
 ```
 
-También puedes usar el archivo `.env.example` como referencia:
+También puedes basarte en el archivo `.env.example`:
 
 ```bash
 cp .env.example .env
@@ -57,11 +109,11 @@ cp .env.example .env
 docker compose up -d postgres
 ```
 
-PostgreSQL quedará disponible en:
+Base de datos disponible en:
 
 - host: `localhost`
 - puerto: `5432`
-- base de datos: `trading_lab`
+- nombre: `trading_lab`
 
 ### 2) Instalar dependencias del backend
 
@@ -76,11 +128,11 @@ npm install
 npm run dev
 ```
 
-La API quedará levantada en:
+La API queda en:
 
 - `http://localhost:4000`
 
-Comprobar estado del servicio:
+Comprobar salud del servicio:
 
 ```bash
 curl http://localhost:4000/api/health
@@ -114,7 +166,7 @@ Abre la aplicación en:
 
 - `http://localhost:3000`
 
-## Endpoints actuales del backend
+## Endpoints del backend
 
 ### Salud
 
@@ -122,7 +174,7 @@ Abre la aplicación en:
 GET /api/health
 ```
 
-### Cotización en tiempo real
+### Cotización actual
 
 ```http
 GET /api/market/quote/:symbol
@@ -134,16 +186,60 @@ Ejemplo:
 curl "http://localhost:4000/api/market/quote/AAPL"
 ```
 
-### Historial de precios
+### Historial de precios desde proveedor
 
 ```http
 GET /api/market/history/:symbol?interval=1day&outputsize=30
 ```
 
+### Historial persistido en base de datos
+
+```http
+GET /api/market/candles/:symbol?interval=1day&limit=30
+```
+
+Alias útil:
+
+```http
+GET /api/market/synced-history/:symbol?interval=1day&limit=30
+```
+
+### Sincronizar un activo a PostgreSQL
+
+```http
+POST /api/sync/assets/:symbol?interval=1day&outputsize=30
+```
+
 Ejemplo:
 
 ```bash
-curl "http://localhost:4000/api/market/history/AAPL?interval=1day&outputsize=30"
+curl -X POST "http://localhost:4000/api/sync/assets/AAPL?interval=1day&outputsize=50"
+```
+
+### Listado de activos
+
+```http
+GET /api/assets
+```
+
+### Activo por símbolo
+
+```http
+GET /api/assets/:symbol
+```
+
+### Estadísticas por activo
+
+```http
+GET /api/assets/:symbol/stats
+```
+
+### Indicadores técnicos
+
+```http
+GET /api/indicators/sma/:symbol?interval=1day&period=14
+GET /api/indicators/ema/:symbol?interval=1day&period=14
+GET /api/indicators/rsi/:symbol?interval=1day&period=14
 ```
 
 ## Scripts disponibles
@@ -154,10 +250,10 @@ Desde `backend/`:
 
 | Comando | Descripción |
 | --- | --- |
-| `npm run dev` | Inicia la API en modo desarrollo con recarga automática. |
-| `npm run build` | Compila la aplicación TypeScript. |
+| `npm run dev` | Inicia la API con recarga automática y levanta PostgreSQL si está configurado. |
+| `npm run build` | Compila TypeScript. |
 | `npm start` | Ejecuta la versión compilada. |
-| `npm test` | Marcador temporal; aún no hay suite de pruebas configurada. |
+| `npm test` | Marcador temporal; se puede ampliar con suite de pruebas real. |
 
 ### Frontend
 
@@ -166,44 +262,60 @@ Desde `frontend/`:
 | Comando | Descripción |
 | --- | --- |
 | `npm run dev` | Inicia la app en modo desarrollo. |
-| `npm run build` | Genera la compilación de producción. |
-| `npm start` | Sirve la compilación de producción. |
+| `npm run build` | Genera build de producción. |
+| `npm start` | Sirve la app compilada. |
 | `npm run lint` | Ejecuta ESLint. |
 
-## Estructura del proyecto
+## Arquitectura actual
+
+La estructura del proyecto ya refleja la separación funcional entre datos, servicios y presentación:
 
 ```text
 Trading-Lab/
-├── .env                     # Variables locales del entorno
-├── .env.example            # Plantilla de configuración
-├── compose.yaml            # Configuración de PostgreSQL con Docker Compose
-├── README.md               # Documentación principal
+├── .env
+├── .env.example
+├── compose.yaml
+├── README.md
 ├── backend/
 │   ├── package.json
 │   ├── tsconfig.json
 │   └── src/
-│       ├── app.ts          # Entrada principal de la API
-│       ├── config/         # Configuración de entorno
-│       ├── controllers/    # Controladores HTTP
-│       ├── database/       # Pool de PostgreSQL
-│       ├── market-data/    # Integración con Twelve Data
-│       ├── middleware/     # Middleware de Express
-│       ├── models/         # Modelos de negocio
-│       ├── repositories/   # Acceso a datos
-│       ├── routes/         # Definición de rutas
-│       ├── services/       # Lógica de negocio
-│       └── utils/          # Utilidades compartidas
-├── database/               # Scripts, migraciones o recursos de BD
-├── docker/                 # Configuración y utilidades Docker
-├── docs/                   # Documentación del proyecto
+│       ├── app.ts
+│       ├── config/
+│       ├── controllers/
+│       │   ├── market.controller.ts
+│       │   ├── assets.controller.ts
+│       │   └── sync.controller.ts
+│       ├── database/
+│       ├── market-data/
+│       ├── models/
+│       ├── repositories/
+│       │   ├── market-candle.repository.ts
+│       │   └── asset.repository.ts
+│       ├── routes/
+│       │   ├── market.routes.ts
+│       │   ├── assets.routes.ts
+│       │   └── sync.routes.ts
+│       ├── services/
+│       │   ├── market/
+│       │   └── indicators/
+│       └── utils/
+├── database/
+│   └── migrations/
+│       └── 001_market_schema.sql
+├── docker/
+├── docs/
 ├── frontend/
-│   ├── app/                # Enrutado principal de Next.js
-│   ├── public/             # Archivos estáticos
+│   ├── app/
+│   │   ├── (dashboard)/market/page.tsx
+│   │   ├── layout.tsx
+│   │   └── page.tsx
+│   ├── public/
 │   ├── package.json
 │   ├── tsconfig.json
-│   ├── next.config.ts
-│   └── README.md           # README base generado por Next.js
-└── .gitignore
+│   └── next.config.ts
+├── .gitignore
+└── Plan Roadmap Trading-Lab ACTUALIZADO.md
 ```
 
 ## Gestión del entorno local
@@ -220,18 +332,18 @@ Detener y eliminar el contenedor:
 docker compose down
 ```
 
-El volumen `trading_lab_postgres_data` conserva la información incluso si el contenedor se reinicia.
+El volumen `trading_lab_postgres_data` conserva la información aunque reinicies el contenedor.
 
 ## Próximos pasos recomendados
 
-- conectar y normalizar el acceso a PostgreSQL con modelos reales
-- definir migraciones y esquema inicial para usuarios, cartera y señales
-- ampliar la API con indicadores, noticias, portafolios y backtesting
-- sustituir la pantalla inicial de Next.js por el dashboard de Trading Lab
-- añadir pruebas automatizadas para backend y frontend
-- separar servicios y rutas según dominio funcional
+- ampliar el catálogo de mercados y activos con más fuentes
+- añadir modelos de usuario, cartera y señales
+- definir backtesting y estrategias propias con indicadores avanzados
+- crear pruebas automatizadas para backend y frontend
+- reforzar validación de errores y manejo de rate limits
+- preparar módulos de noticias, portfolio y alertas
 
 ## Notas finales
 
-Este repositorio está pensado como base para un entorno de trading con análisis técnico, datos de mercado y un flujo de trabajo propio para pruebas de estrategias. La estructura actual es funcional para arrancar, validar datos y preparar la capa de negocio que se desarrollará en las siguientes iteraciones.
+Trading Lab ya tiene una base de datos operativa, integración con datos reales, sincronización de series históricas y una primera experiencia visual útil para análisis de mercado. El proyecto está evolucionando desde una base técnica hacia un entorno de trading con dashboard, indicadores y lógica de persistencia que puede servir de base para futuras funcionalidades de estrategia, cartera y automatización.
 

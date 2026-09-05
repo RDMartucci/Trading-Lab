@@ -1,3 +1,5 @@
+// backend/src/services/indicators/rsi.service.ts
+
 export function calculateRsi(values: number[], period: number): Array<number | null> {
   if (!Number.isInteger(period) || period <= 0) {
     throw new Error("PERIOD_MUST_BE_POSITIVE_INTEGER");

@@ -1,3 +1,5 @@
+// backend/src/services/indicators/ema.service.ts
+
 export function calculateEma(values: number[], period: number): Array<number | null> {
   if (!Number.isInteger(period) || period <= 0) {
     throw new Error("PERIOD_MUST_BE_POSITIVE_INTEGER");
